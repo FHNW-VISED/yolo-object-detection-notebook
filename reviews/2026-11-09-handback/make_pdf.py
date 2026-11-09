@@ -39,7 +39,7 @@ PAGES = [
      "metric rewards.", None, ["a-ap.png"], "New in this version"),
     ("8 · New: the NMS slider", "The validation image with the most objects, at the default NMS IoU of 0.7 next to "
      "the student's setting. Shown at 0.95: duplicates appear (false positives 3 → 58). At 0.3 nothing changes on this dataset, because "
-     "the weeds rarely overlap; the task and its Sample Answer say so, so the "lost neighbors" side of NMS is only described "
+     "the weeds rarely overlap; the task and its Sample Answer say so, so the 'lost neighbors' side of NMS is only described "
      "here, not seen. A crowded dataset (the aerial-cows variant) would show both sides.",
      None, ["a-nms.png"], "New in this version"),
     ("9 · YOLOv7-tiny became YOLO11n vs YOLO11s (optional)", "Both optional experiments stay behind one checkbox, "
