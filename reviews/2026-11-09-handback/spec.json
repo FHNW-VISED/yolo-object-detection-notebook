@@ -1,0 +1,369 @@
+[
+ {
+  "html": "before.html",
+  "cells": [
+   5,
+   8
+  ],
+  "out": "b-setup.png",
+  "marks": [
+   {
+    "cell": 5,
+    "text": "2025.07",
+    "label": "1",
+    "open": false
+   },
+   {
+    "cell": 8,
+    "text": "torch==2.5.0",
+    "label": "2",
+    "open": false
+   }
+  ],
+  "max_h": 1600
+ },
+ {
+  "html": "before.html",
+  "cells": [
+   17,
+   18
+  ],
+  "out": "b-clone.png",
+  "marks": [
+   {
+    "cell": 18,
+    "text": "git clone",
+    "label": "3",
+    "open": false
+   }
+  ],
+  "max_h": 1600
+ },
+ {
+  "html": "after.html",
+  "cells": [
+   5,
+   6
+  ],
+  "out": "a-setup.png",
+  "marks": [
+   {
+    "cell": 5,
+    "text": "installs Ultralytics",
+    "label": "1",
+    "open": false
+   }
+  ],
+  "max_h": 1600
+ },
+ {
+  "html": "after.html",
+  "cells": [
+   10,
+   10
+  ],
+  "out": "a-models.png",
+  "marks": [
+   {
+    "cell": 10,
+    "text": "YOLO11n",
+    "label": "3",
+    "open": false
+   }
+  ],
+  "max_h": 1600
+ },
+ {
+  "html": "before.html",
+  "cells": [
+   21,
+   21
+  ],
+  "out": "b-data.png",
+  "marks": [
+   {
+    "cell": 21,
+    "text": "cattle dataset",
+    "label": "1",
+    "open": false
+   }
+  ],
+  "max_h": 1600
+ },
+ {
+  "html": "after.html",
+  "cells": [
+   12,
+   12
+  ],
+  "out": "a-data.png",
+  "marks": [
+   {
+    "cell": 12,
+    "text": "spray only those spots",
+    "label": "1",
+    "open": false
+   }
+  ],
+  "max_h": 1600
+ },
+ {
+  "html": "after.html",
+  "cells": [
+   19,
+   19
+  ],
+  "out": "a-gt.png",
+  "marks": [],
+  "max_h": 700
+ },
+ {
+  "html": "after.html",
+  "cells": [
+   20,
+   21
+  ],
+  "out": "a-coco.png",
+  "marks": [
+   {
+    "cell": 20,
+    "text": "What Does a COCO Model See?",
+    "label": "2",
+    "open": false
+   }
+  ],
+  "max_h": 1300
+ },
+ {
+  "html": "before.html",
+  "cells": [
+   31,
+   31
+  ],
+  "out": "b-explore.png",
+  "marks": [
+   {
+    "cell": 31,
+    "text": "Analyze the images and labels by visual inspection",
+    "label": "1",
+    "open": false
+   }
+  ],
+  "max_h": 1600
+ },
+ {
+  "html": "before.html",
+  "cells": [
+   37,
+   37
+  ],
+  "out": "b-explore2.png",
+  "marks": [
+   {
+    "cell": 37,
+    "text": "Analyze the images and labels using code",
+    "label": "2",
+    "open": false
+   }
+  ],
+  "max_h": 1600
+ },
+ {
+  "html": "after.html",
+  "cells": [
+   12,
+   12
+  ],
+  "out": "a-explore.png",
+  "marks": [
+   {
+    "cell": 12,
+    "text": "Here we only look briefly",
+    "label": "1",
+    "open": false
+   }
+  ],
+  "max_h": 1600
+ },
+ {
+  "html": "before.html",
+  "cells": [
+   46,
+   50
+  ],
+  "out": "b-train.png",
+  "marks": [
+   {
+    "cell": 46,
+    "text": "batch_size",
+    "label": "1",
+    "open": false
+   },
+   {
+    "cell": 50,
+    "text": "train.py",
+    "label": "2",
+    "open": false
+   }
+  ],
+  "max_h": 1600
+ },
+ {
+  "html": "after.html",
+  "cells": [
+   25,
+   26
+  ],
+  "out": "a-train.png",
+  "marks": [
+   {
+    "cell": 25,
+    "text": "How Long and How Big?",
+    "label": "1",
+    "open": false
+   }
+  ],
+  "max_h": 1600
+ },
+ {
+  "html": "after.html",
+  "cells": [
+   31,
+   31
+  ],
+  "out": "a-curves.png",
+  "marks": [
+   {
+    "cell": 31,
+    "text": null,
+    "label": "2",
+    "open": false
+   }
+  ],
+  "max_h": 700
+ },
+ {
+  "html": "before.html",
+  "cells": [
+   74,
+   75
+  ],
+  "out": "b-iou.png",
+  "marks": [
+   {
+    "cell": 74,
+    "text": "Calculate the IOU",
+    "label": "1",
+    "open": false
+   },
+   {
+    "cell": 75,
+    "text": "TODO",
+    "label": "2",
+    "open": false
+   }
+  ],
+  "max_h": 1600
+ },
+ {
+  "html": "after.html",
+  "cells": [
+   39,
+   40
+  ],
+  "out": "a-tpfp.png",
+  "marks": [
+   {
+    "cell": 39,
+    "text": "Find one example of each",
+    "label": "1",
+    "open": false
+   }
+  ],
+  "max_h": 1500
+ },
+ {
+  "html": "after.html",
+  "cells": [
+   46,
+   47
+  ],
+  "out": "a-pr.png",
+  "marks": [
+   {
+    "cell": 46,
+    "text": "Precision or Recall?",
+    "label": "1",
+    "open": false
+   }
+  ],
+  "max_h": 1700
+ },
+ {
+  "html": "after.html",
+  "cells": [
+   50,
+   52
+  ],
+  "out": "a-ap.png",
+  "marks": [
+   {
+    "cell": 50,
+    "text": null,
+    "label": "2",
+    "open": false
+   },
+   {
+    "cell": 52,
+    "text": null,
+    "label": "3",
+    "open": false
+   }
+  ],
+  "max_h": 1700
+ },
+ {
+  "html": "after.html",
+  "cells": [
+   56,
+   56
+  ],
+  "out": "a-nms.png",
+  "marks": [],
+  "max_h": 1900
+ },
+ {
+  "html": "before.html",
+  "cells": [
+   83,
+   86
+  ],
+  "out": "b-tiny.png",
+  "marks": [
+   {
+    "cell": 83,
+    "text": "Tiny YOLO",
+    "label": "1",
+    "open": false
+   }
+  ],
+  "max_h": 1600
+ },
+ {
+  "html": "after.html",
+  "cells": [
+   60,
+   61
+  ],
+  "out": "a-ns.png",
+  "marks": [
+   {
+    "cell": 60,
+    "text": "Is the Larger Model Worth It?",
+    "label": "1",
+    "open": false
+   }
+  ],
+  "max_h": 1500
+ }
+]
