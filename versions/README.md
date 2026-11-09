@@ -12,3 +12,4 @@ Never edit a version folder.
 | v03 | 2026-11-09 | v03: trim pass, visible text 3,221 → ~1,780 words (her original ~1,400); all tasks and answers kept | 71bd190 |
 | v04 | 2026-11-09 | v04: runs on a Mac's GPU (MPS) when no CUDA GPU is found | d840600 |
 | v05 | 2026-11-09 | v05: her full structure restored (every task, label and box from v02), sentences shortened | 2ca346b |
+| v06 | 2026-11-09 | v05-crowded: same notebook on a crowded dataset | cbd3f96 |
