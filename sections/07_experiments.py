@@ -81,8 +81,9 @@ if RUN_EXPERIMENTS or SMOKE:
     model_frozen = YOLO("yolo11n.pt")
     start = time.time()
     model_frozen.train(name="yolo11n-frozen", freeze=10, **train_settings)
+    train_minutes_frozen = (time.time() - start) / 60
     comparison["YOLO11n, frozen backbone"] = {**evaluate(model_frozen.trainer.best),
-                                              "training minutes": round((time.time() - start) / 60, 1)}
+                                              "training minutes": round(train_minutes_frozen, 1)}
     display(comparison)
 else:
     print("Skipped: tick RUN_EXPERIMENTS above and run this cell again.")
@@ -92,8 +93,9 @@ else:
 callout("answer", "💡 Sample Answer", r"""
 <p><strong>The mAP is lower</strong> (in our run mAP@50 dropped from about 0.78 to about 0.72), because the
 features stay those learned for COCO's everyday photos, and aerial images of plants look nothing like them.
-<strong>Training time barely changes</strong> for such a small model: the frozen layers still compute their
-outputs, only their gradients are skipped.</p>
+<strong>Training is not faster here</strong>, unlike what you might expect: for such a small model the frozen
+layers still compute their outputs, only their gradients are skipped, and the saving is lost in the rest of the
+work (in our test runs the frozen model even took longer).</p>
 <p>Freezing is a good choice with very few training images (it reduces overfitting), with little GPU memory, or
 when the new images look like the pretraining images. The further our images are from COCO, the more it helps to
 fine-tune the backbone as well.</p>
