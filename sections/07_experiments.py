@@ -52,12 +52,13 @@ else:
 # %%
 # @title 💡 Sample Answer { display-mode: "form" }
 callout("answer", "💡 Sample Answer", r"""
-<p><strong>YOLO11s is usually a few points of mAP better</strong>, with the larger gain in mAP@50–95 (tighter
-boxes), and it takes roughly one and a half to two times as long to train and to predict.</p>
-<p><strong>Choose YOLO11n</strong> for a phone, a drone or a camera with a small chip, or when many images per
-second are needed. <strong>Choose YOLO11s</strong> (or larger) when a GPU is available and every missed object
-counts. On a small dataset the larger model can also overfit sooner, so compare on the validation images, never on
-the training images.</p>
+<p><strong>On this small dataset, YOLO11s is not clearly better.</strong> In our test run both models reached about
+the same mAP@50 (roughly 0.75–0.8) and mAP@50–95 (roughly 0.45–0.5), and YOLO11s was sometimes a little lower,
+while it took two to three times as long to train and was slower per image.</p>
+<p><strong>Why:</strong> with a few hundred images, the data, not the model size, limits the result; the larger
+model has more to learn from too little. <strong>Choose YOLO11n</strong> for a drone or a small chip, or when
+many images per second are needed. A larger model pays off with more data, or when every missed object counts.
+Always compare on the validation images, never on the training images.</p>
 """)
 
 # %% [markdown]
@@ -89,10 +90,12 @@ else:
 # %%
 # @title 💡 Sample Answer { display-mode: "form" }
 callout("answer", "💡 Sample Answer", r"""
-<p><strong>Training is faster</strong>, because no gradients are computed for the frozen layers, <strong>and the
-mAP is usually somewhat lower</strong>, because the features stay those learned for COCO's everyday photos.</p>
-<p>Freezing is a good choice with very few training images (it reduces overfitting), with little compute, or when
-the new images look like the pretraining images. The further our images are from COCO, the more it helps to
+<p><strong>The mAP is lower</strong> (in our run mAP@50 dropped from about 0.78 to about 0.72), because the
+features stay those learned for COCO's everyday photos, and aerial images of plants look nothing like them.
+<strong>Training time barely changes</strong> for such a small model: the frozen layers still compute their
+outputs, only their gradients are skipped.</p>
+<p>Freezing is a good choice with very few training images (it reduces overfitting), with little GPU memory, or
+when the new images look like the pretraining images. The further our images are from COCO, the more it helps to
 fine-tune the backbone as well.</p>
 """)
 
