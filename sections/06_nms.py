@@ -10,7 +10,7 @@
 # 3. Delete every remaining box whose IoU with the kept box is larger than the **NMS IoU threshold**.
 # 4. Repeat with the next box that is still left.
 #
-# Ultralytics uses an NMS IoU threshold of 0.7 by default (the `iou` argument of `predict`).
+# The threshold is the `iou` argument of `predict`. This notebook uses 0.7, the value Ultralytics uses when it computes metrics (its default for plain predictions is a little lower, 0.5).
 
 # %% [markdown]
 # ### 🟡 NMS Threshold: Duplicates or Missed Neighbors?

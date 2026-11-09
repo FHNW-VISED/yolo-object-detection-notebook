@@ -37,8 +37,9 @@ same object, only the most confident one is kept.</li>
 # %%
 # @title 🔍 Go Deeper: Why YOLO11 and Not the Newest YOLO?
 callout("deeper", "🔍 Go Deeper: Why YOLO11 and Not the Newest YOLO?", r"""
-<p style="margin:6px 0 0 0;">Ultralytics' newest model family, YOLO26, is <em>NMS-free</em>: it is trained to output
-one box per object, so the duplicate-removal step disappears at inference time. That is convenient for deployment,
-but it hides a step that every other detector still uses, and that you will explore with a slider. YOLO11 keeps
-classic NMS, so we use it here. Everything else in this notebook works the same with YOLO26.</p>
+<p style="margin:6px 0 0 0;">Ultralytics' newest family, YOLO26 (2026), can also run <em>NMS-free</em>: a second
+output head is trained to give one box per object, so the duplicate-removal step can be skipped at inference time
+(<code>nms=False</code>). On small fine-tuning datasets like ours, YOLO11 performs about as well, and its classic
+pipeline shows every step you explore in this notebook. Swapping in YOLO26 is a one-word change:
+<code>YOLO("yolo26n.pt")</code>.</p>
 """)
