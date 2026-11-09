@@ -90,10 +90,14 @@ from ultralytics import YOLO
 random.seed(SEED)
 np.random.seed(SEED)
 
-DEVICE = 0 if torch.cuda.is_available() else "cpu"  # 0 = the first GPU
-if torch.cuda.is_available():
+if torch.cuda.is_available():  # Colab GPU (0 = the first GPU)
+    DEVICE = 0
     print(f"GPU: {torch.cuda.get_device_name(0)}")
+elif torch.backends.mps.is_available():  # a Mac's own GPU, for running the notebook on a Mac
+    DEVICE = "mps"
+    print("Apple GPU (MPS) found: training runs on it.")
 else:
+    DEVICE = "cpu"
     print("No GPU found. Training will be very slow: Runtime → Change runtime type → T4 GPU, then run again.")
 
 RUNS_DIR = Path("runs")  # Ultralytics writes weights and plots here
