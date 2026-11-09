@@ -32,8 +32,8 @@ BRIEF = [
      "Default model: 7.5 min for 20 epochs on a Mac GPU. Not yet measured on a Colab T4.", "–"),
     ("If possible, a slider for the NMS threshold", PART,
      "Built. But on this dataset only one side is visible: at 0.95 duplicates appear (false positives 3 → 58); low values change nothing, because the weeds rarely overlap. The Sample Answer says so.", "8"),
-    ("Keep the notebook short", NO,
-     "Fewer cells (66 vs 90), but more to read: about 3,200 visible words vs 1,400 (2.3×), plus about 1,300 words hidden in the Sample Answers. Most of the extra text is the new precision–recall, AP and NMS parts and the front matter.", "–"),
+    ("Keep the notebook short", PART,
+     "A bit longer than yours, as allowed for the new parts: about 1,780 visible words vs 1,400 (1.26×), 62 cells vs 90, 1 shell command vs 23. A trim pass cut the visible text from 3,200 words; every task and Sample Answer stayed. The Sample Answers (about 1,300 words) are hidden in toggles.", "–"),
     ("Complement the exploration notebook without duplicating it", OK,
      "No exploration tasks and no IoU implementation here; both are in Know Your Images.", "3"),
 ]

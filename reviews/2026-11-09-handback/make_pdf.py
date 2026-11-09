@@ -54,7 +54,7 @@ SUMMARY = """
 TP/FP/FN, optional experiments) and your tasks with Sample Answers, on YOLO11 and the Ultralytics Python API, with
 a new dataset and two new interactive parts. Each page shows your version on the left and the new one on the
 right; the red numbers mark the exact place.</p>
-<p><b>Is it shorter?</b> No. It has fewer cells (66 instead of 90) and 1 shell command instead of 23, but about 3,200 visible words instead of 1,400 (2.3 times), plus about 1,300 words hidden in the Sample Answers. Most of the extra text is the new precision–recall, AP and NMS parts and the front matter.</p>
+<p><b>Is it shorter?</b> A little longer than yours, for the new parts you asked for: about 1,780 visible words instead of 1,400 (1.26 times), 62 cells instead of 90, and 1 shell command instead of 23. The Sample Answers (about 1,300 words) are hidden in toggles.</p>
 <p><b>Tested:</b> runs top to bottom headless (CPU smoke test, every check passing) and once in full on a Mac:
 YOLO11n trained 20 epochs in 7.5 minutes there, mAP@50 0.83, mAP@50–95 0.50; the whole notebook including both optional experiments ran in 45 minutes without an error. A full run in Colab on a T4 is still to do.
 Why YOLO11 and not the newer YOLO26: on Ultralytics' own 37-dataset fine-tuning benchmark YOLO11n scores slightly
