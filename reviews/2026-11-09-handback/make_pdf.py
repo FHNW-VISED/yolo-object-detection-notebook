@@ -5,6 +5,8 @@ from pathlib import Path
 
 from playwright.async_api import async_playwright
 
+from checklist import html as checklist_html
+
 HERE = Path(__file__).parent
 CHROME = ("/Users/simone.bonato/Library/Caches/ms-playwright/chromium_headless_shell-1234/"
           "chrome-headless-shell-mac-arm64/chrome-headless-shell")
@@ -52,10 +54,7 @@ SUMMARY = """
 TP/FP/FN, optional experiments) and your tasks with Sample Answers, on YOLO11 and the Ultralytics Python API, with
 a new dataset and two new interactive parts. Each page shows your version on the left and the new one on the
 right; the red numbers mark the exact place.</p>
-<p><b>Is it shorter?</b> In cells and commands, yes: 66 cells instead of 90, and 1 shell command instead of 23. In
-reading, no: about 2,600 words of text instead of 1,500, because the precision–recall, AP and NMS parts are new
-and explained. If it should be shorter still, the first candidates to cut are the AP-per-class figure (page 7) and
-the freezing experiment (page 9).</p>
+<p><b>Is it shorter?</b> No. It has fewer cells (66 instead of 90) and 1 shell command instead of 23, but about 3,200 visible words instead of 1,400 (2.3 times), plus about 1,300 words hidden in the Sample Answers. Most of the extra text is the new precision–recall, AP and NMS parts and the front matter.</p>
 <p><b>Tested:</b> runs top to bottom headless (CPU smoke test, every check passing) and once in full on a Mac:
 YOLO11n trained 20 epochs in 7.5 minutes there, mAP@50 0.83, mAP@50–95 0.50; the whole notebook including both optional experiments ran in 45 minutes without an error. A full run in Colab on a T4 is still to do.
 Why YOLO11 and not the newer YOLO26: on Ultralytics' own 37-dataset fine-tuning benchmark YOLO11n scores slightly
@@ -84,16 +83,19 @@ p { font-size: 12.5px; line-height: 1.45; margin: 4px 0 8px; max-width: 250mm; }
 .row { display: flex; gap: 8mm; align-items: flex-start; }
 .col { flex: 1; min-width: 0; }
 figure { margin: 0 0 4mm; } figcaption { font-size: 11px; font-weight: bold; color: #D7263D; margin-bottom: 2px; }
+table { border-collapse: collapse; font-size: 11px; width: 100%; } th { background: #FDE70E; text-align: left; }
+td, th { border: 1px solid #d1d5db; padding: 3px 6px; vertical-align: top; } td.st { white-space: nowrap; }
 img { width: 100%; max-height: 150mm; object-fit: contain; object-position: top left;
       border: 1px solid #d1d5db; border-radius: 4px; }
 </style></head><body>
 <section><h1>Object Detection with YOLO11: what changed</h1>
 <p style="color:#6b7280">Simone Bonato · 9 November 2026</p>{summary}</section>
+{checklist}
 {pages}</body></html>"""
 
 
 async def main(out: Path):
-    html = HTML.replace("{summary}", SUMMARY).replace("{pages}", "".join(page(*p) for p in PAGES))
+    html = HTML.replace("{summary}", SUMMARY).replace("{checklist}", checklist_html()).replace("{pages}", "".join(page(*p) for p in PAGES))
     src = HERE / "report.html"
     src.write_text(html)
     async with async_playwright() as p:
