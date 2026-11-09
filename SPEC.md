@@ -50,6 +50,11 @@ one epoch on CPU). The dataset is never committed (N-019); `data/` holds only sm
 - Fetch in Colab (no login): `huggingface_hub.snapshot_download` of only the sampled images and labels (about 53 MB, 1 to 2 minutes), then a local `data.yaml`. Idempotent: a finished download is reused.
 - SMOKE subset: 8 train and 4 valid images through the same code, `imgsz` 160, one epoch on CPU.
 
+## 4b. Length
+**Word budget:** 2300
+<!-- Visible words by `just lint` (markdown + boxes; Sample Answers, go-deeper boxes and 🔴 optional parts excluded).
+     Susanne's structure (SN-011…SN-015, SN-018) is never cut to meet it: shorten sentences inside the elements. -->
+
 ## 5. Environment
 | Item | Value |
 |---|---|

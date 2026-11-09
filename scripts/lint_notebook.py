@@ -30,7 +30,7 @@ BOXPLOT_RE = re.compile(r"\bboxplot\(")
 
 # Visible words allowed per section: markdown and callout text, without go-deeper boxes, <details> blocks
 # and 🔴 Optional parts. A target, not a gate: an over-budget section prints a WARNING.
-WORD_BUDGETS = {0: 400, 1: 400, 2: 550, 3: 550, 4: 500, 5: 800, 6: 450, 7: 650}  # SPEC L-001
+WORD_BUDGETS: dict[int, int] = {}  # optional per-section targets (WARNING only)
 HEADING_RE = re.compile(r"^(#{1,6})\s+(.*\S)\s*$")
 DETAILS_RE = re.compile(r"<details\b.*?</details>", re.S | re.I)
 HTML_RE = re.compile(r"<!--.*?-->|<[^>]+>", re.S)
@@ -131,6 +131,34 @@ def check_word_budget(num: int, cells) -> None:
         )
 
 
+CALLOUT_CALL_RE = re.compile(r'callout\("(?!answer)[a-z-]+",[^\n]*r"""(.*?)"""', re.S)
+BUDGET_RE = re.compile(r"\*\*Word budget:\*\*\s*([\d,]+)")
+
+
+def total_visible_words(all_cells) -> int:
+    """Markdown + every non-answer callout(...) box in code cells: what a student reads without opening it."""
+    words = visible_words(all_cells)
+    for cell in all_cells:
+        if cell.cell_type == "code":
+            for body in CALLOUT_CALL_RE.findall(cell.source):
+                words += count_words(body)
+    return words
+
+
+def check_total_budget(all_cells) -> None:
+    """FAIL when the notebook shows more words than SPEC's '**Word budget:** N' (set at grilling).
+
+    Why (2026-11-09): the YOLO notebook was written at 2.3x its original and needed a whole trim pass."""
+    m = BUDGET_RE.search(SPEC.read_text()) if SPEC.exists() else None
+    if not m:
+        warnings.append("WARNING SPEC.md has no '**Word budget:** N' line: set one at grilling")
+        return
+    budget, words = int(m.group(1).replace(",", "")), total_visible_words(all_cells)
+    if words > budget:
+        over = words - budget
+        fail("notebook", f"{words} visible words > Word budget {budget} (+{over}): cut text, keep tasks")
+
+
 def yourcode_stubs(src: str) -> list[ast.FunctionDef]:
     """The top-level functions of a '# ✍️ YOUR CODE' cell (the stubs the learner fills)."""
     try:
@@ -171,10 +199,12 @@ def main() -> int:
 
     expected_q = 1
     smoke_defined = False
+    all_cells = []
     for path in files:
         rel = f"sections/{path.name}"
         nb = jupytext.read(path, fmt="py:percent")
         cells = nb.cells
+        all_cells += cells
         check_word_budget(int(path.name[:2]), cells)
         if not cells or cells[0].cell_type != "markdown" or not cells[0].source.lstrip().startswith("#"):
             fail(rel, "first cell must be a markdown heading (N-003)")
@@ -244,6 +274,7 @@ def main() -> int:
 
     for p in problems:
         print(p)
+    check_total_budget(all_cells)
     for w in warnings:
         print(w)
     print(f"lint: {len(files)} sections, {expected_q - 1} questions, {len(problems)} problems")
