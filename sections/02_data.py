@@ -3,23 +3,53 @@
 #
 # Download the dataset, recall YOLO's label format, and take a short look at the images and their boxes.
 #
-# <!-- VARIANT: two or three sentences: what the images show, who would use such a detector and why (the story),
-# how many images and classes, and that this domain is far from COCO's everyday photos. -->
+# Cameras at game feeders and on trails take thousands of photos a week, day and night, and most show little. A detector
+# that finds the animals lets a landowner count how many hogs and deer visit, and see when feral hogs come back, without
+# looking at every picture. Our dataset has two classes, **deer** and **hog**, from such cameras: most night shots are
+# infrared and black and white, animals are often partly hidden or cut off by the image edge, and none of it looks like
+# COCO's everyday photos.
 #
-# You explored a detection dataset in depth in *Know Your Images*. Here we only look briefly, enough to know what the model has to learn.
+# You explored a detection dataset in depth in *Know Your Images*. Here we only look briefly, enough to know what the model has to learn. The photos come from a handful of camera spots, so validation images look much like training images; a new camera would score lower.
 
 # %% [markdown]
-# The next cell downloads the dataset (VARIANT: size) the first time it runs; later runs reuse it.
+# The next cell downloads the images (about 40 MB, one to two minutes) the first time it runs; later runs reuse them. The full dataset has about 1,200 labeled images; to keep training short we use a fixed random subset of 500 training and 150 validation images.
 
 # %%
 # @title Download the Dataset { display-mode: "form" }
+from huggingface_hub import HfApi, snapshot_download
 from ultralytics.data.utils import check_det_dataset
 
-DATASET = "medical-pills.yaml"  # VARIANT: an Ultralytics dataset name, or the data.yaml of a downloaded dataset
-
-data_info = check_det_dataset(DATASET)  # downloads and unzips on first use, then only checks
-CLASS_NAMES = [data_info["names"][k] for k in sorted(data_info["names"])]
+DATASET_REPO = "LibreYOLO/trail-camera"  # Roboflow 100 "trail-camera" (CC BY 4.0), mirrored on Hugging Face
+N_TRAIN, N_VAL = (8, 4) if SMOKE else (500, 150)  # images of the fixed random subset (a few in the smoke test)
 IMAGE_SUFFIXES = {".jpg", ".jpeg", ".png", ".bmp"}
+
+
+def download_subset(n_train: int, n_val: int) -> Path:
+    """Download n_train + n_val random images with their labels (same ones every time) and return the data.yaml.
+
+    Idempotent: files that are already there are not fetched again, and a half-finished download is completed.
+    """
+    import yaml
+
+    root = Path(f"data/datasets/trail-camera-{n_train}-{n_val}").resolve()
+    repo_files = HfApi().list_repo_files(DATASET_REPO, repo_type="dataset", token=False)
+    wanted = ["data.yaml"]
+    for split, n in (("train", n_train), ("valid", n_val)):
+        stems = sorted(f[:-4] for f in repo_files if f.startswith(f"{split}/images/") and f.endswith(".jpg"))
+        for stem in random.Random(SEED).sample(stems, n):
+            wanted += [f"{stem}.jpg", f"{stem.replace('/images/', '/labels/')}.txt"]
+    snapshot_download(DATASET_REPO, repo_type="dataset", token=False, local_dir=root, allow_patterns=wanted)
+    names = yaml.safe_load((root / "data.yaml").read_text())["names"]  # ["Deer", "Hog"]
+    yaml_path = root / "subset.yaml"
+    yaml_path.write_text(yaml.safe_dump({"path": str(root), "train": "train/images", "val": "valid/images",
+                                         "names": dict(enumerate(names))}))
+    return yaml_path
+
+
+subset_yaml = download_subset(N_TRAIN, N_VAL)  # the data.yaml of our subset
+data_info = check_det_dataset(str(subset_yaml))  # checks that the images and labels are where the yaml says
+DATA_YAML = Path(data_info["yaml_file"])
+CLASS_NAMES = [data_info["names"][k] for k in sorted(data_info["names"])]
 
 
 def images_in(folder) -> list[Path]:
@@ -33,28 +63,8 @@ def label_path_for(image: Path) -> Path:
     return Path(*parts[:i], "labels", *parts[i + 1:]).with_suffix(".txt")
 
 
-def make_smoke_subset(n_train: int = 8, n_val: int = 4) -> Path:
-    """Automated tests only: a copy of a few images and labels, with its own data.yaml."""
-    import shutil
-
-    import yaml
-
-    root = Path("data/smoke").resolve()
-    for split, source, n in (("train", data_info["train"], n_train), ("val", data_info["val"], n_val)):
-        for image in images_in(source)[:n]:
-            for src, kind in ((image, "images"), (label_path_for(image), "labels")):
-                if src.exists():
-                    (root / split / kind).mkdir(parents=True, exist_ok=True)
-                    shutil.copy(src, root / split / kind / src.name)
-    yaml_path = root / "data.yaml"
-    yaml_path.write_text(yaml.safe_dump({"path": str(root), "train": "train/images", "val": "val/images",
-                                         "names": dict(enumerate(CLASS_NAMES))}))
-    return yaml_path
-
-
-DATA_YAML = make_smoke_subset() if SMOKE else Path(data_info["yaml_file"])
-TRAIN_IMAGES = images_in(Path(DATA_YAML).parent / "train/images") if SMOKE else images_in(data_info["train"])
-VAL_IMAGES = images_in(Path(DATA_YAML).parent / "val/images") if SMOKE else images_in(data_info["val"])
+TRAIN_IMAGES = images_in(data_info["train"])
+VAL_IMAGES = images_in(data_info["val"])
 print(f"{len(TRAIN_IMAGES)} training images · {len(VAL_IMAGES)} validation images · classes: {', '.join(CLASS_NAMES)}")
 
 # %% [markdown]
@@ -69,11 +79,12 @@ print(f"{len(TRAIN_IMAGES)} training images · {len(VAL_IMAGES)} validation imag
 # A file `data.yaml` tells Ultralytics where the training and validation images are and what the classes are called:
 #
 # ```
-# path: VARIANT
-# train: images/train
-# val: images/val
+# path: /content/data/datasets/trail-camera-500-150
+# train: train/images
+# val: valid/images
 # names:
-#   0: VARIANT
+#   0: Deer
+#   1: Hog
 # ```
 #
 # The next cell prints the first lines of one label file and its image size.
@@ -189,7 +200,10 @@ show(fig)
 # %%
 # @title 💡 Sample Answer { display-mode: "form" }
 callout("answer", "💡 Sample Answer", r"""
-<p>VARIANT: what the COCO model actually predicts on these images, read from a full run.</p>
+<p><strong>The COCO model sees animals, but calls them by the wrong name.</strong> On the four images shown it
+labels hogs as elephants or horses, and on one image it finds nothing at all. Over all validation images it
+reports at least one box on about 60 % of them, mostly <em>sheep</em>, <em>horse</em>, <em>elephant</em>,
+<em>bear</em> and <em>cow</em>, and never <em>deer</em> or <em>hog</em>, which COCO does not have.</p>
 <p><strong>Why fine-tune:</strong> a detector can only output the classes it was trained on. Its features (edges,
 textures, shapes) are still useful, so we keep them and teach the last layers our classes.</p>
 """)

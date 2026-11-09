@@ -67,7 +67,7 @@ curves_50 = pr_curves(all_predictions)
 # %% [markdown]
 # ### 🟡 The Confidence Threshold: Precision or Recall?
 #
-# Imagine the detector is used to count objects automatically, and every invented box makes the count too high, while every missed object makes it too low.
+# Imagine the detector is used to count how many animals visit a feeder each night: every invented box makes the count too high, and every missed animal makes it too low.
 #
 # **Before running the code:**
 # - If you raise the confidence threshold from 0.1 to 0.8, what happens to precision and to recall? Write down your guess.
@@ -111,10 +111,14 @@ _ = widgets.interact(show_threshold,
 callout("answer", "💡 Sample Answer", r"""
 <p><strong>Raising the threshold increases precision and lowers recall.</strong> Low-confidence boxes are mostly
 false positives, so removing them makes the shown boxes more trustworthy (fewer orange boxes), but some real
-objects also had low confidence and are now missed (more red boxes). The dot slides left and up along the curve.</p>
-<p><strong>For counting</strong>, both errors change the count, so a threshold where the two kinds of mistake are
-about equally frequent (often around 0.3–0.5) works best. No threshold is best for both, because the same
-low-confidence boxes contain both the invented objects and some of the real ones.</p>
+animals also had low confidence and are now missed (more red boxes). The dot slides left and up along the curve.
+Over all validation images, precision rises from roughly 0.7 at confidence 0.1 to 0.99 at 0.8, while recall falls
+from about 0.9 to 0.5: the move is gentle up to about 0.5 and steep beyond 0.6.</p>
+<p><strong>For counting</strong>, only the difference between invented and missed boxes matters, so a threshold
+where the two are about equally frequent works best. For this model that is around 0.3, where each error kind
+occurs about 30 to 35 times on the 150 validation images and the errors cancel in the total. No threshold is
+best for both precision and recall, because the same low-confidence boxes contain both the invented animals and
+some of the real ones.</p>
 """)
 
 # %% [markdown]
@@ -176,10 +180,13 @@ print(f"mAP@50–95, our computation: {np.mean(map_per_iou):.3f} · Ultralytics 
 # %%
 # @title 💡 Sample Answer { display-mode: "form" }
 callout("answer", "💡 Sample Answer", r"""
-<p><strong>AP falls as the required IoU rises.</strong> At 0.5 almost every found object counts; at 0.9 only boxes
-that fit the object very tightly do. A large gap between mAP@50 and mAP@50–95 means the model <em>finds</em> the
-objects but its boxes are not precise.</p>
-<p><strong>mAP@50</strong> is the right number when finding and counting is what matters (how many objects, are any
-there at all). <strong>mAP@50–95</strong> matters when the box itself is used: measuring an object's size, cropping
-it for a second model, or guiding a robot to it.</p>
+<p><strong>AP falls as the required IoU rises.</strong> At 0.5 almost every found animal counts; at 0.9 only
+boxes that fit the animal very tightly do. For our model mAP@50 is about 0.9 to 0.95 and mAP@50–95 about 0.6 to
+0.65, a gap of roughly 0.3. The bars stay high up to about IoU 0.75 and then drop fast (around 0.2 at 0.9, close
+to 0 at 0.95): the model <em>finds</em> the animals reliably, but its boxes are only moderately tight. Part of that
+is the labels: a box around a hog that is half cut off by the image edge or hidden in grass is a matter of
+judgment, and two annotators would not agree to the last pixel.</p>
+<p><strong>mAP@50</strong> is the right number when finding and counting is what matters (how many hogs came,
+is any animal there at all). <strong>mAP@50–95</strong> matters when the box itself is used: measuring an animal's
+size, cropping it for a second model that tells young from adult, or pointing a second camera at it.</p>
 """)

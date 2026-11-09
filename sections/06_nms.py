@@ -15,7 +15,7 @@
 # %% [markdown]
 # ### 🟡 NMS Threshold: Duplicates or Missed Neighbors?
 #
-# The image below is the validation image with the most annotated objects, where objects stand close together.
+# The image below is the validation image with the most annotated animals, where animals stand close together.
 #
 # **Before running the code:**
 # - A *low* NMS threshold deletes boxes that overlap only a little. What could go wrong when two real objects stand side by side?
@@ -62,10 +62,14 @@ _ = widgets.interact(show_nms, nms_iou=widgets.FloatSlider(value=0.7, min=0.1, m
 # %%
 # @title 💡 Sample Answer { display-mode: "form" }
 callout("answer", "💡 Sample Answer", r"""
-<p><strong>Close to 1.0, duplicates appear:</strong> almost no box is deleted, so one object is covered by several
-boxes; only one of them can be the true positive, the others count as false positives.</p>
-<p><strong>At low values, neighbors disappear:</strong> two real objects that overlap a little are treated as one,
-the less confident box is deleted, and its object becomes a false negative.</p>
-<p><strong>The best value depends on crowding:</strong> where objects never overlap, a low threshold is safe; in
-dense scenes (herds, shelves, crowds) real objects overlap, and a higher threshold is needed to keep them.</p>
+<p><strong>Close to 1.0, duplicates appear:</strong> almost no box is deleted, so one animal is covered by
+several boxes; only one of them can be the true positive, the others count as false positives. On this image they
+start to show above roughly 0.85, and at 1.0 there are dozens of orange boxes.</p>
+<p><strong>At low values, neighbors disappear:</strong> two real animals that overlap a little are treated as one,
+the less confident box is deleted, and its animal becomes a false negative. On this image that happens below
+roughly 0.2, first at the animals standing in front of one another.</p>
+<p><strong>In between, nothing changes much:</strong> from about 0.2 to 0.8 the boxes are almost identical, so the
+default 0.7 is not a delicate choice here. <strong>The best value depends on crowding:</strong> where animals never
+overlap, a low threshold is safe; in a group at the feeder, real animals overlap, and a higher threshold is needed
+to keep them.</p>
 """)

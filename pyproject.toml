@@ -9,6 +9,7 @@ dependencies = [
     "numpy",
     "matplotlib",
     "ultralytics>=8.4.208",
+    "huggingface_hub",  # preinstalled in Colab; fetches the dataset (sections/02_data.py)
     "ipywidgets>=8.1.9",
     "pandas>=3.1.1",
 ]

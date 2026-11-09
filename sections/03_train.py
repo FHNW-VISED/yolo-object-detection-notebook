@@ -23,13 +23,13 @@ four training images into one), so the model rarely sees the same picture twice.
 # %% [markdown]
 # ### 🟢 Training Settings: How Long and How Big?
 #
-# The original YOLO paper trained for hundreds of epochs on COCO's 118,000 images. We have a few hundred images, a pretrained model, and a free Colab GPU with 15 GB of memory.
+# The original YOLO paper trained for hundreds of epochs on COCO's 118,000 images. We have 500 training images, a pretrained model, and a free Colab GPU with 15 GB of memory.
 #
 # **Before running the code:**
 # - How many epochs do you expect to need, more or fewer than for COCO? Why?
 #
 # **Explore:**
-# 1. Set `EPOCHS` and `BATCH_SIZE` in the cell below. `EPOCHS` can be 5 to 50; `BATCH_SIZE` 8, 16 or 32 (a T4 handles 16 at 640 px for YOLO11n). Each extra 10 epochs costs roughly one to two minutes on a T4.
+# 1. Set `EPOCHS` and `BATCH_SIZE` in the cell below. `EPOCHS` can be 5 to 50; `BATCH_SIZE` 8, 16 or 32 (a T4 handles 16 at 640 px for YOLO11n). Each extra 10 epochs costs roughly three to four minutes on a T4.
 # 2. Run the training cell after it.
 #
 # **Observe and interpret:**
@@ -48,9 +48,9 @@ print(f"Training for {EPOCHS} epochs with batches of {BATCH_SIZE} images at {IMG
 # %%
 # @title 💡 Sample Answer { display-mode: "form" }
 callout("answer", "💡 Sample Answer", r"""
-<p><strong>Fewer epochs than for COCO.</strong> The model starts from pretrained weights and our dataset is small,
-so 20 epochs are usually enough for the validation mAP to level off; much longer training mostly memorizes the
-training images.</p>
+<p><strong>Far fewer epochs than for COCO.</strong> The model starts from pretrained weights and our dataset is
+small, so 20 epochs already give a good detector, with a validation mAP@50 around 0.9 or higher. More epochs would
+still add a little, mostly in mAP@50–95, but the gain per epoch is small and each one costs about 20 seconds on a T4.</p>
 <p><strong>Batch size 16</strong> fits comfortably in a T4's memory for YOLO11n at 640 px. Smaller batches also
 work but each epoch takes longer; 32 may run out of memory for the larger YOLO11s.</p>
 """)
@@ -58,7 +58,7 @@ work but each epoch takes longer; 32 may run out of memory for the larger YOLO11
 # %% [markdown]
 # ### Train
 #
-# The next cell fine-tunes YOLO11n. Ultralytics prints one progress line per epoch: the losses on the training images, then precision, recall and mAP on the validation images. **The first epoch is the slowest**, because the images are read and cached. On a T4 the whole run takes a few minutes.
+# The next cell fine-tunes YOLO11n. Ultralytics prints one progress line per epoch: the losses on the training images, then precision, recall and mAP on the validation images. **The first epoch is the slowest**, because the images are read and cached. On a T4 the whole run with the default settings takes about 6 to 8 minutes.
 
 # %%
 # @title Train YOLO11n { display-mode: "form" }
@@ -114,8 +114,11 @@ show(fig)
 # %%
 # @title 💡 Sample Answer { display-mode: "form" }
 callout("answer", "💡 Sample Answer", r"""
-<p><strong>Both losses fall quickly in the first epochs and then flatten.</strong> The validation mAP rises
-steeply at first and levels off in the last third of the run: more epochs would add little.</p>
+<p><strong>Both losses fall steadily, and neither has flattened completely at epoch 20.</strong> The validation mAP
+is jumpy in the first epochs (it can even drop while the new classes are being learned), then climbs quickly and
+rises only slowly in the last few epochs. So the model is still learning a little: a longer run would help
+slightly, a shorter one would cost accuracy. Because the validation loss falls together with the training loss,
+there is no sign of overfitting yet.</p>
 <p><strong>A warning sign would be</strong> a training loss that keeps falling while the validation loss rises:
 the model then memorizes the training images (overfitting), and fewer epochs or more augmentation would help.</p>
 """)

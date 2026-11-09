@@ -174,9 +174,16 @@ browse_show()
 # %%
 # @title 💡 Sample Answer { display-mode: "form" }
 callout("answer", "💡 Sample Answer", r"""
-<p><strong>True positives</strong> are the clearly visible objects of typical size: the model was trained on many of them.</p>
-<p><strong>False positives</strong> are often duplicates of a found object, boxes around a group of objects, or
-background that looks like an object. Some are real objects that the annotator missed: the model is right and the
-label is wrong.</p>
-<p><strong>False negatives</strong> are mostly small, partly hidden, or cut off at the image edge.</p>
+<p><strong>True positives</strong> are the clearly visible animals: a hog or deer of medium or large size, lit by
+daylight or by the infrared flash. In a full run the model finds roughly nine in ten of all animals, and about seven in ten of the validation images have no mistake at all.</p>
+<p><strong>False positives</strong> are fewer than you might expect and come in three kinds, about equally often:
+a box where nothing is labeled, such as a dim animal far in the background (sometimes the model is right and the
+label is missing) or a shadow; a box on a real animal that fits badly, so that its IoU stays below 0.5 (typical
+for close-ups and animals cut off by the image edge); and a second box on an animal that was already found.
+Mixing up deer and hog is very rare.</p>
+<p><strong>False negatives</strong> are mostly small, distant, dark or half-hidden animals, in particular on
+night images, and animals that are only partly inside the image. The median missed animal is about half as wide
+and tall as the median found one.</p>
+<p><strong>Which is more frequent?</strong> At confidence 0.25 invented boxes and missed animals are about equally
+frequent (some tens of each), with slightly more false positives.</p>
 """)

@@ -39,9 +39,20 @@ These appear in the Learning Objectives banner of `00_setup.py`.
 3. Interpret a precision–recall curve, AP, mAP@50 and mAP@50–95, and compare two model sizes with them.
 
 ## 4. Use case and data
-Decided per **variant** (see §11). Each variant names: the dataset, its source URL and licence, splits and
-classes, how it is fetched in Colab (no login), and its SMOKE subset (a few train and val images, `imgsz` 160,
-one epoch on CPU). The dataset is never committed (N-019); `data/` holds only small manifests if any.
+**Variant: Trail Camera (deer and hogs).** Wildlife cameras at game feeders and trails; a detector counts the
+animals that visit and flags feral hogs, so nobody has to look at thousands of night-time infrared photos.
+- **Dataset:** "trail-camera" from the Roboflow 100 benchmark (original author: My Game Pics), mirrored at
+  https://huggingface.co/datasets/LibreYOLO/trail-camera. **CC BY 4.0.** Credits go in the repo, not in the notebook (N-045).
+- **Classes:** 2 (`Deer`, `Hog`). 640×640 images, boxes about 100 px wide at the median, 35 % of images show two or more animals.
+  Full dataset: 941 train, 239 validation, 131 test images; **we use a fixed seeded subset of 500 train + 150 validation**
+  (`random.Random(SEED).sample` over the sorted file list) and never touch the test split.
+- **Fetch in Colab (no login):** `huggingface_hub` (preinstalled) lists the repo once, then `snapshot_download(token=False,
+  allow_patterns=[the 650 images and labels])`: about 42 MB, one to two minutes, idempotent and resumable (N-019).
+  A small `subset.yaml` is written next to the files and checked with `check_det_dataset`.
+- **SMOKE subset:** the same code with 8 train + 4 validation images, `imgsz` 160, one epoch on CPU.
+- **Known limits:** the images come from a handful of camera spots, so train and validation images look alike and the
+  validation numbers are optimistic for a new camera. Labels are not perfect: some boxes are loose, and some dim animals in the background may be unlabeled.
+  The COCO model has no deer or hog class, so its predictions show "our objects under other names".
 
 ## 5. Environment
 | Item | Value |
