@@ -15,7 +15,7 @@
 # %% [markdown]
 # ### 🟡 NMS Threshold: Duplicates or Missed Neighbors?
 #
-# The image below is the validation image with the most annotated objects, where objects stand close together.
+# The image below is the validation image with the most annotated objects. It has about twenty weeds, spread over the whole image.
 #
 # **Before running the code:**
 # - A *low* NMS threshold deletes boxes that overlap only a little. What could go wrong when two real objects stand side by side?
@@ -27,7 +27,7 @@
 #
 # **Observe and interpret:**
 # - At which values do duplicates appear (orange boxes on top of a green one)?
-# - At which values do real objects get deleted (red dashed outlines next to a green box)?
+# - At which values do real objects get deleted (red dashed outlines next to a green box), if any?
 # - Why does the best value depend on how crowded the scenes are?
 
 # %%
@@ -63,9 +63,13 @@ _ = widgets.interact(show_nms, nms_iou=widgets.FloatSlider(value=0.7, min=0.1, m
 # @title 💡 Sample Answer { display-mode: "form" }
 callout("answer", "💡 Sample Answer", r"""
 <p><strong>Close to 1.0, duplicates appear:</strong> almost no box is deleted, so one object is covered by several
-boxes; only one of them can be the true positive, the others count as false positives.</p>
-<p><strong>At low values, neighbors disappear:</strong> two real objects that overlap a little are treated as one,
-the less confident box is deleted, and its object becomes a false negative.</p>
-<p><strong>The best value depends on crowding:</strong> where objects never overlap, a low threshold is safe; in
-dense scenes (herds, shelves, crowds) real objects overlap, and a higher threshold is needed to keep them.</p>
+boxes; only one of them can be the true positive, the others count as false positives. On this image the false
+positives stay at about 4 up to 0.75, then grow to over 10 at 0.85 and to more than 50 at 0.95, while the true
+positives do not change.</p>
+<p><strong>At low values nothing happens here:</strong> the red outlines and the green boxes stay the same from 0.1
+to 0.75. NMS can only delete a real neighbor when two real objects overlap, and the weeds in these images are tiny
+and stand apart, so their boxes almost never touch. In a different dataset the low end would show lost neighbors.</p>
+<p><strong>The best value depends on crowding:</strong> where objects never overlap, any value from low to about
+0.7 is safe, as here; in dense scenes (herds, shelves, crowds, weeds growing in a clump) real objects overlap, and a
+higher threshold is needed to keep them.</p>
 """)

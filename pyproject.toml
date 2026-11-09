@@ -24,6 +24,7 @@ dev = [
     "jupyterlab>=4",
     "markdown>=3.11.2",
     "markdownify>=0.13",
+    "huggingface-hub>=2.4.0",
 ]
 
 [tool.ruff]

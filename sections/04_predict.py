@@ -129,7 +129,7 @@ print(f"{len(VAL_IMAGES)} validation images: {n_boxes} predicted boxes, {n_gt} g
 # Each image shows the ground truth as dashed outlines and the predictions as solid boxes with their class and confidence. The colors already apply the rule from the box above.
 #
 # **Before running the code:**
-# - Which kind of mistake do you expect more often for this dataset: invented objects (FP) or missed objects (FN)?
+# - For the weed detector, which kind of mistake do you expect more often: invented weeds (FP) or missed weeds (FN)?
 #
 # **Explore:**
 # - Browse at least ten validation images with Previous / Next.
@@ -174,9 +174,13 @@ browse_show()
 # %%
 # @title 💡 Sample Answer { display-mode: "form" }
 callout("answer", "💡 Sample Answer", r"""
-<p><strong>True positives</strong> are the clearly visible objects of typical size: the model was trained on many of them.</p>
-<p><strong>False positives</strong> are often duplicates of a found object, boxes around a group of objects, or
-background that looks like an object. Some are real objects that the annotator missed: the model is right and the
-label is wrong.</p>
-<p><strong>False negatives</strong> are mostly small, partly hidden, or cut off at the image edge.</p>
+<p><strong>True positives</strong> are weeds that stand out from bare soil: a small green plant with nothing else
+around it. At confidence 0.25 the model finds roughly four out of five of the labeled objects.</p>
+<p><strong>False positives are more frequent than false negatives</strong>, about three times as many. Almost all
+of them are small spots with no label nearby, not duplicates: tiny seedlings, leaf fragments, straw or dark patches
+of soil. Many look like the objects that <em>are</em> labeled, so the labeling is possibly incomplete there and the
+model right; only a look at the image can tell.</p>
+<p><strong>False negatives</strong> are mostly the smallest objects (about 17 pixels across, against about 21 for
+all objects), weeds that look unlike the typical small seedling (for example one much larger than the others), and
+weeds in a planter between similar-looking crop seedlings.</p>
 """)
