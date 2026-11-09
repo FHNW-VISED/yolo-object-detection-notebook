@@ -134,6 +134,7 @@ def test_model_comparison_n_vs_s(nb):
 def test_american_english(nb):
     """Her brief: American English (and SN-016)."""
     text = "\n".join(c.source for c in nb.cells)
-    british_words = ("colour", "behaviour", "normalis", "visualis", "organis", "analyse", "labelled", "centre")
+    british_words = ("colour", "behaviour", "normalis", "visualis", "organis", "analyse", "labelled",
+                     "centre")
     for british in british_words:
         assert british not in text.lower(), f"British spelling: {british}"
