@@ -1,19 +1,38 @@
 # %% [markdown]
 # ## Fine-Tune YOLO11n
 #
-# We do not train from scratch: the model starts from COCO weights, so it already knows edges, textures and shapes, and fine-tuning adapts it to our classes. That is why a few hundred images and a few minutes are enough.
+# Choose training settings, fine-tune YOLO11n on our dataset, and read its training curves.
+#
+# We do not train from scratch. The model starts from COCO weights, so it already knows edges, textures and shapes; fine-tuning adapts it to our classes. A few hundred images and minutes suffice.
+
+# %%
+# @title 📘 The Main Training Settings
+callout("theory", "📘 The Main Training Settings", r"""
+<ul style="margin:6px 0 0 0;padding-left:22px;">
+<li><strong>epochs</strong>: how many times the model sees every training image. More epochs learn more, until it
+memorizes the training set.</li>
+<li><strong>batch</strong>: images processed together in one step. Larger batches give smoother gradients but
+need more GPU memory.</li>
+<li><strong>imgsz</strong>: the pixel size of an image's longer side. Small objects need a larger size.</li>
+<li><strong>Data augmentation</strong> is on by default (for example <em>mosaic</em>, which stitches four images
+into one), so the model rarely sees the same picture twice.</li>
+</ul>
+""")
 
 # %% [markdown]
 # ### 🟢 Training Settings: How Long and How Big?
 #
-# - **epochs**: how often the model sees every training image; too many and it memorizes them.
-# - **batch**: images per training step; larger batches need more GPU memory.
+# YOLO was trained for hundreds of epochs on COCO's 118,000 images. We have a few hundred images, a pretrained model, and a free Colab GPU.
 #
-# YOLO was trained for hundreds of epochs on COCO's 118,000 images. We have 500 images and a pretrained model.
+# **Before running the code:**
+# - Will you need more or fewer epochs than for COCO? Why?
 #
-# **Explore:** set `EPOCHS` (5–50) and `BATCH_SIZE` (8, 16 or 32; a T4 handles 16). Every 10 extra epochs cost about three minutes on a T4.
+# **Explore:**
+# 1. Set `EPOCHS` (5 to 50) and `BATCH_SIZE` (8, 16 or 32; a T4 handles 16) in the cell below. Each extra 10 epochs costs about three minutes on a T4.
+# 2. Run the training cell after it.
 #
-# **Observe and interpret:** after training, did the model stop improving before the last epoch?
+# **Observe and interpret:**
+# - Did the model stop improving before the last epoch, or would more epochs help?
 
 # %%
 # ✏️ YOUR TURN: training settings
@@ -39,7 +58,7 @@ work but each epoch takes longer; 32 may run out of memory for the larger YOLO11
 # %% [markdown]
 # ### Train
 #
-# Ultralytics prints one line per epoch: training losses, then precision, recall and mAP on the validation images. The first epoch is the slowest. The default run takes about 6–8 minutes on a T4.
+# The next cell fine-tunes YOLO11n and prints one line per epoch: training losses, then precision, recall and mAP on the validation images. **The first epoch is the slowest**, because the images are cached. On a T4 the default run takes 6 to 8 minutes.
 
 # %%
 # @title Train YOLO11n { display-mode: "form" }
@@ -68,9 +87,12 @@ print(f"\nTraining took {train_minutes_n:.1f} min. Best weights: {best_weights}"
 # %% [markdown]
 # ### 🟢 Training Curves: Is the Model Still Learning?
 #
-# Left: the box loss (how far predicted boxes are from the true ones) per epoch. Right: the validation mAP, a score from 0 to 1 explained later.
+# The left plot shows the box loss (how far predicted boxes are from true ones) per epoch. The right plot shows the validation mAP, a score from 0 to 1 explained later: higher is better.
 #
-# **Observe and interpret:** are the losses still falling and the mAP still rising at the last epoch? Would you train longer or shorter?
+# **Observe and interpret:**
+# - Do both losses still go down at the last epoch?
+# - Is the validation mAP still rising or leveled off?
+# - Would you train longer, shorter, or keep your setting?
 
 # %%
 # @title 🔎 Plot the Training Curves { display-mode: "form" }
@@ -101,3 +123,12 @@ and is still creeping up: 30 epochs would probably add a few points, but not cha
 the model then memorizes the training images (overfitting), and fewer epochs or more augmentation would help.</p>
 """)
 
+# %%
+# @title 🔍 Go Deeper: More Training Plots and Experiment Tracking
+callout("deeper", "🔍 Go Deeper: More Training Plots and Experiment Tracking", r"""
+<p style="margin:6px 0 0 0;">Ultralytics saves more plots in the run folder (<code>runs/yolo11n/</code> in the
+Colab file browser): all losses, example training batches with their augmentations, and a confusion matrix.
+For comparing many runs, it can log to tools such as Weights &amp; Biases or MLflow; see the
+<a href="https://docs.ultralytics.com/integrations/">Ultralytics integrations</a>. To keep your weights after the
+Colab session ends, copy <code>best.pt</code> to your Google Drive.</p>
+""")

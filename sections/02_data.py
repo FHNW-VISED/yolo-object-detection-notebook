@@ -1,12 +1,14 @@
 # %% [markdown]
 # ## The Dataset
 #
-# A drone photographs a field from above. A farmer who knows where the weeds are can spray only those spots, which saves herbicide. So the detector must find every weed and tell it apart from the crop plants.
+# Download the dataset, recall YOLO's label format, and look at some images and boxes.
 #
-# The images look down at the soil, with boxes around two classes, crop and weed; almost all boxes are weeds, and they are tiny (about 20 pixels in a 640 × 640 image). We only look briefly here: *Know Your Images* covered dataset exploration.
+# A drone flies low over a field and takes photos. A farmer who knows where the weeds are can spray only those spots, saving herbicide. A detector must find every weed and tell it from the crop.
+#
+# Our dataset has photos taken from above, with boxes around crop plants and weeds: two classes, almost all weeds. The objects are tiny, around 20 pixels wide in a 640 × 640 image, and look nothing like COCO's photos. We only look briefly here.
 
 # %% [markdown]
-# The next cell downloads the data (about 55 MB, one to two minutes, only the first time). To keep training short, we use a fixed subset: 500 training and 150 validation images.
+# The next cell downloads the images (about 55 MB, one to two minutes the first time; later runs reuse them). To keep training short, we use a fixed random subset: 500 training and 150 validation images.
 
 # %%
 # @title Download the Dataset { display-mode: "form" }
@@ -64,13 +66,13 @@ print(f"{len(TRAIN_IMAGES)} training images · {len(VAL_IMAGES)} validation imag
 # %% [markdown]
 # ### Data Format Recap
 #
-# YOLO expects one text file per image, with the same name, in a `labels` folder next to `images`. Each line is one object: its class index and its box, **normalized** by the image size (values between 0 and 1):
+# YOLO expects one text file per image, with the same name, in a `labels` folder next to `images`. Each line is one object: class index and box, **normalized** by image width and height (0 to 1):
 #
 # ```
 # class_idx x_center y_center width height
 # ```
 #
-# A file `data.yaml` names the image folders and the classes:
+# A file `data.yaml` tells Ultralytics where the images are and what the classes are called:
 #
 # ```
 # path: /content/data/datasets/weed-crop-aerial-500-150
@@ -80,6 +82,8 @@ print(f"{len(TRAIN_IMAGES)} training images · {len(VAL_IMAGES)} validation imag
 #   0: crop
 #   1: weed
 # ```
+#
+# The next cell prints the first lines of one label file and its image size.
 
 # %%
 # @title 🔎 Read One Label File { display-mode: "form" }
@@ -120,7 +124,7 @@ def show_gt(ax, image, title=""):
 # %% [markdown]
 # ### A Short Look at the Training Images
 #
-# Four training images per page, boxes colored by class. Browse a few pages.
+# Each page shows four training images with their ground-truth boxes, one color per class. Browse a few pages to see the objects' size, how many appear together, and how they differ from everyday photos.
 
 # %%
 # @title 🔎 Browse Training Images with Their Boxes { display-mode: "form" }
@@ -164,11 +168,16 @@ gt_show()
 # %% [markdown]
 # ### 🟢 Before Fine-Tuning: What Does a COCO Model See?
 #
-# The pretrained YOLO11n knows COCO's 80 everyday classes (people, cars, dogs, cups…), none of them ours.
+# The pretrained YOLO11n knows COCO's 80 everyday classes: people, cars, dogs, cups. None is one of ours.
 #
-# **Before running the code:** will it predict nothing, wrong classes, or our plants under another name?
+# **Before running the code:**
+# - What will it predict on our images: nothing, wrong classes, or our objects under another name?
 #
-# **Observe and interpret:** which COCO classes appear, and what does this say about why we fine-tune?
+# **Explore:**
+# - Run the cell to see its predictions on four validation images.
+#
+# **Observe and interpret:**
+# - Which COCO classes does it use, if any? Why do we need to fine-tune?
 
 # %%
 # @title 🔎 Predict with the COCO-Pretrained Model { display-mode: "form" }

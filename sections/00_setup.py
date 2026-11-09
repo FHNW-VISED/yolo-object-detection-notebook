@@ -4,12 +4,18 @@
 #
 # Simone Bonato & Susanne Suter, FHNW
 #
-# Object detection finds the individual objects in an image and marks each one with a class label and a bounding box. In this notebook, we fine-tune a pretrained YOLO11 model on drone images of a field, look at what it gets right and wrong, and learn to read the standard detection metrics.
+# Object detection means finding each object in an image and marking it with a class label and a bounding box. Here, we fine-tune a pretrained YOLO11 model on a small, unusual dataset, inspect its mistakes, and learn to read the metrics detection papers report.
 #
-# It complements *Know Your Images*, where you explored a detection dataset before training. The best practices of Karpathy's [A Recipe for Training Neural Networks](https://karpathy.github.io/2019/04/25/recipe/) apply here as well.
+# It complements *Know Your Images*, where you explored a detection dataset. Here we train.
+#
+# *Andrej Karpathy's [A Recipe for Training Neural Networks](https://karpathy.github.io/2019/04/25/recipe/) applies here too, though we do not follow it step by step.*
 
 # %% [markdown]
-# **A note about this notebook:** it was developed with AI assistance and reviewed by the authors. Not every detail could be verified; if something looks wrong or confusing, please let us know.
+# **A note about this notebook**
+#
+# This notebook was developed with AI assistance and reviewed, edited, and extended by the authors. Not every detail could be thoroughly verified.
+#
+# If you find errors, unexpected behavior, or anything confusing, please let us know.
 
 # %%
 # @title Learning Objectives
@@ -35,7 +41,9 @@ confidence and NMS thresholds change them.</li>
 """)
 
 # %% [markdown]
-# **What Do You Need to Know for the Exam and Your Project?** The concepts and decisions: what fine-tuning changes, what makes a detection a true or false positive, how the two thresholds trade precision against recall, and what each metric rewards. Not the numbers of this dataset or the function arguments.
+# **What Do You Need to Know for the Exam and Your Project?**
+#
+# Focus on concepts and decisions: what fine-tuning changes, what makes a detection a true or false positive, how the two thresholds trade precision against recall, and what each metric rewards. You do **not** need to memorize this dataset's numbers or Ultralytics arguments.
 
 # %%
 # @title How to Use This Notebook
@@ -45,8 +53,10 @@ HTML(r"""
 <div class="callout" style="background:#F5F5F5;color:#374151;border-left:6px solid #9CA3AF;border-radius:6px;padding:12px 14px;line-height:1.5;font-family:'Google Sans',Roboto,'Helvetica Neue',Arial,sans-serif;font-size:14px;width:100%;box-sizing:border-box;white-space:normal;overflow-wrap:break-word;margin:2px 0;">
 <div style="font-weight:bold;">How to Use This Notebook</div>
 <ul style="margin:6px 0 0 0;padding-left:22px;">
-<li style="margin:2px 0;">Save a copy in Drive, then select Runtime → Change runtime type → T4 GPU.</li>
-<li style="margin:2px 0;">Run the cells in order; training takes a few minutes. Answer each task before opening its 💡 Sample Answer.</li>
+<li style="margin:2px 0;">Make a copy (File → Save a copy in Drive), then select a GPU: Runtime → Change runtime type → T4 GPU.</li>
+<li style="margin:2px 0;">Run the cells in order. Training the default model takes a few minutes on a T4; keep reading while it runs.</li>
+<li style="margin:2px 0;">Answer each task before you open its 💡 Sample Answer.</li>
+<li style="margin:2px 0;">The 🔴 experiments at the end are optional and train two more models.</li>
 </ul>
 </div>
 """)
@@ -54,7 +64,7 @@ HTML(r"""
 # %% [markdown]
 # ### Setup
 #
-# The next cell installs Ultralytics (the library behind YOLO11) and loads the helpers. It takes about a minute.
+# The next cell installs Ultralytics (the library behind YOLO11), checks for a GPU, and loads the helpers. It takes about a minute.
 
 # %%
 # @title Setup (run me first) { display-mode: "form" }

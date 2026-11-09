@@ -1,16 +1,34 @@
 # %% [markdown]
 # ## Non-Maximum Suppression
 #
-# A well-visible object usually gets several overlapping candidate boxes. **NMS** keeps the most confident one and deletes every other box of the same class whose IoU with it is above the **NMS IoU threshold**, then repeats with the next remaining box. This notebook uses 0.7, the value Ultralytics uses for metrics (the `iou` argument of `predict`).
+# See how the NMS threshold trades duplicate boxes against missed neighbors.
+#
+# The network proposes thousands of candidate boxes, and a clearly visible object usually gets several overlapping ones. **Non-maximum suppression (NMS)** keeps one box per object:
+#
+# 1. Sort the boxes of one class by confidence.
+# 2. Keep the most confident box.
+# 3. Delete every remaining box whose IoU with the kept box exceeds the **NMS IoU threshold**.
+# 4. Repeat with the next box still left.
+#
+# The threshold is the `iou` argument of `predict`. We use 0.7, the value Ultralytics uses for metrics (its plain-prediction default is 0.5).
 
 # %% [markdown]
 # ### 🟡 NMS Threshold: Duplicates or Missed Neighbors?
 #
-# The validation image with the most objects: about twenty weeds. Left: the default 0.7; right: your setting.
+# The image below is the validation image with the most annotated objects, about twenty weeds spread over it.
 #
-# **Before running the code:** what will you see at 1.0, where nothing is deleted? And what could go wrong at a low value when two real objects touch?
+# **Before running the code:**
+# - A *low* NMS threshold deletes even slightly overlapping boxes. What could go wrong with two real objects side by side?
+# - A threshold of 1.0 deletes nothing. What will you see?
 #
-# **Observe and interpret:** at which values do duplicates appear (orange on top of green), and do real objects ever get deleted? Why does the best value depend on how crowded the scenes are?
+# **Explore:**
+# 1. Move the `NMS IoU` slider from 0.1 to 1.0. The left panel shows the default 0.7, the right your setting.
+# 2. Watch the TP, FP and FN counts in the titles.
+#
+# **Observe and interpret:**
+# - At which values do duplicates appear (orange boxes on a green one)?
+# - At which values, if any, do real objects get deleted (red dashed outlines beside a green box)?
+# - Why does the best value depend on how crowded the scenes are?
 
 # %%
 # @title 🔎 Explore the NMS Threshold { display-mode: "form" }

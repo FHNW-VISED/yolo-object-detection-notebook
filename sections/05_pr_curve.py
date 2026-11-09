@@ -1,13 +1,15 @@
 # %% [markdown]
 # ## Precision, Recall and AP
 #
-# Which boxes we keep depends on a confidence threshold, and each threshold gives different TPs, FPs and FNs:
+# Explore how the confidence threshold trades precision against recall, and how AP, mAP@50 and mAP@50–95 summarize it.
 #
-# - **Precision** = TP / (TP + FP): the share of shown boxes that are real.
-# - **Recall** = TP / (TP + FN): the share of real objects found.
+# Every box comes with a confidence. Which boxes we keep depends on a threshold, and each threshold gives different TP, FP and FN counts. Two numbers summarize them:
+#
+# - **Precision** = TP / (TP + FP): the share of shown boxes that are real objects.
+# - **Recall** = TP / (TP + FN): the share of real objects the model finds.
 
 # %% [markdown]
-# The next cell predicts again, keeping every box down to a confidence of 0.001 (as Ultralytics does for metrics); the threshold below then just filters them.
+# The next cell predicts again, keeping every box down to confidence 0.001, as Ultralytics does for metrics. Each threshold below then just filters these boxes.
 
 # %%
 # @title Predict with a Very Low Threshold { display-mode: "form" }
@@ -65,13 +67,18 @@ curves_50 = pr_curves(all_predictions)
 # %% [markdown]
 # ### 🟡 The Confidence Threshold: Precision or Recall?
 #
-# The drone sprays every box it shows: an invented box wastes herbicide, a missed weed keeps growing.
+# The drone sprays every spot with a weed box. An invented box wastes herbicide; a missed weed keeps growing.
 #
-# **Before running the code:** if the threshold rises from 0.1 to 0.8, what happens to precision and recall?
+# **Before running the code:**
+# - Raising the confidence threshold from 0.1 to 0.8: what happens to precision and recall? Write down your guess.
 #
-# **Explore:** move the `confidence` slider; the dot on each class's precision–recall curve shows where you are. Try two or three images.
+# **Explore:**
+# 1. Move the `confidence` slider from low to high. The left panel shows one image at that threshold; the right shows each class's precision–recall curve, with a dot at the threshold.
+# 2. Repeat on two or three other images with the `image` slider.
 #
-# **Observe and interpret:** which threshold would you choose for spraying, and why is none best for both precision and recall?
+# **Observe and interpret:**
+# - What happens to the orange (invented) and the red (missed) boxes as the threshold rises?
+# - Which threshold would you choose for spraying, and why is none best for both precision and recall?
 
 # %%
 # @title 🔎 Explore the Confidence Threshold { display-mode: "form" }
@@ -118,7 +125,7 @@ real ones.</p>
 # %% [markdown]
 # ### AP: The Whole Curve in One Number
 #
-# To compare *models*, we want a number that does not depend on the threshold: the **average precision (AP)**, the area under the precision–recall curve (1 = perfect). **mAP** is its mean over the classes; Ultralytics computes it too.
+# Choosing a threshold is a deployment decision. To compare *models*, we want one number that ignores it: the **average precision (AP)**, the area under the precision–recall curve. A perfect detector has AP = 1. **mAP** is the mean AP over all classes. Ultralytics computes it too, as the next cell shows.
 
 # %%
 # @title 🔎 Compute AP per Class and Compare with Ultralytics { display-mode: "form" }
@@ -145,11 +152,17 @@ print(f"mAP@50, Ultralytics val:  {val_metrics.box.map50:.3f} (small differences
 # %% [markdown]
 # ### 🟡 mAP@50 vs. mAP@50–95: What Does Each Reward?
 #
-# So far a box counted as correct with an IoU ≥ 0.5. **mAP@50–95** repeats AP at ten stricter IoU thresholds (0.50, 0.55, …, 0.95) and averages them; it is the main COCO metric.
+# So far a prediction counted as correct at IoU ≥ 0.5, which a box covering two-thirds of an object can pass. **mAP@50–95** averages the AP at ten IoU thresholds, 0.50, 0.55, …, 0.95. It is the main COCO metric, used in the model table at the top.
 #
-# **Before running the code:** will AP go up or down as the required IoU rises?
+# **Before running the code:**
+# - Will AP go up or down as the required IoU rises from 0.50 to 0.95?
 #
-# **Observe and interpret:** what does the gap between mAP@50 and mAP@50–95 say about our boxes? Name an application for each metric.
+# **Explore:**
+# - Run the cell. Each bar is the mAP at one IoU threshold; the dashed line is their mean, mAP@50–95.
+#
+# **Observe and interpret:**
+# - How large is the gap between mAP@50 and mAP@50–95? What does it tell you about the boxes?
+# - Name one application where mAP@50 is the number to watch, and one where mAP@50–95 matters more.
 
 # %%
 # @title 🔎 AP at Ten IoU Thresholds { display-mode: "form" }
