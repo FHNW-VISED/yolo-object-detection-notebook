@@ -39,9 +39,18 @@ These appear in the Learning Objectives banner of `00_setup.py`.
 3. Interpret a precision–recall curve, AP, mAP@50 and mAP@50–95, and compare two model sizes with them.
 
 ## 4. Use case and data
-Decided per **variant** (see §11). Each variant names: the dataset, its source URL and licence, splits and
-classes, how it is fetched in Colab (no login), and its SMOKE subset (a few train and val images, `imgsz` 160,
-one epoch on CPU). The dataset is never committed (N-019); `data/` holds only small manifests if any.
+**Dataset: cable-damage** (Roboflow 100, mirrored as `LibreYOLO/cable-damage` on the Hugging Face Hub), CC BY 4.0,
+source https://huggingface.co/datasets/LibreYOLO/cable-damage. Close-up photos of steel wire cables with two
+damage classes: `break` (a snapped strand) and `thunderbolt` (a burnt, melted spot). Full set: 919 train / 265
+valid / 134 test images, 640 × 640 (stretched), YOLO txt labels, about 64 MB.
+**Use case:** automatic inspection of steel cables (cranes, lifts, cable cars): the detector flags damaged spots
+so an inspector looks only at those.
+**Fetching (no login):** `02_data.py` lists the repo with `huggingface_hub` (preinstalled in Colab) and downloads
+a fixed random subset (seed 42) of **500 train + 150 valid** images with their labels (about 35 MB) into
+`data/datasets/cable-damage`, then writes `train.txt`, `valid.txt` and a local `data.yaml`. The test split is
+unused. Interrupted downloads continue where they stopped.
+**SMOKE subset:** 8 train + 4 valid images (same code, downloaded into `data/smoke`), `imgsz` 160, 1 epoch, CPU.
+The dataset is never committed (N-019); credits are in `data/ATTRIBUTION.md`.
 
 ## 5. Environment
 | Item | Value |

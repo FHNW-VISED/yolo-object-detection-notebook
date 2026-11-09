@@ -15,7 +15,7 @@
 # %% [markdown]
 # ### 🟡 NMS Threshold: Duplicates or Missed Neighbors?
 #
-# The image below is the validation image with the most annotated objects, where objects stand close together.
+# The image below is the validation image with the most annotated objects among those where the fine-tuned model finds at least one (an image where it finds nothing would show nothing to suppress).
 #
 # **Before running the code:**
 # - A *low* NMS threshold deletes boxes that overlap only a little. What could go wrong when two real objects stand side by side?
@@ -33,7 +33,9 @@
 # %%
 # @title 🔎 Explore the NMS Threshold { display-mode: "form" }
 NMS_CONF = 0.25  # the display threshold of section Predictions: TP, FP and FN
-crowded_image = max(VAL_IMAGES, key=lambda p: len(read_gt(p)["cls"]))
+# the image with the most annotated objects among those where the model finds at least one (else: all images)
+found_images = [p for p in VAL_IMAGES if match(val_predictions[p], read_gt(p))[0].any()] or VAL_IMAGES
+crowded_image = max(found_images, key=lambda p: len(read_gt(p)["cls"]))
 nms_detector = YOLO(str(best_weights))
 
 

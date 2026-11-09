@@ -3,27 +3,25 @@
 #
 # Download the dataset, recall YOLO's label format, and take a short look at the images and their boxes.
 #
-# <!-- VARIANT: two or three sentences: what the images show, who would use such a detector and why (the story),
-# how many images and classes, and that this domain is far from COCO's everyday photos. -->
+# Steel cables on cranes, lifts and cable cars are inspected regularly, and a snapped strand that nobody notices can end in an accident. A detector that scans close-up photos and flags the damaged spots lets the inspector look only at those. Our images show steel cables with two kinds of damage, a **break** (a snapped strand) and a **thunderbolt** (a burnt, melted spot), small marks far from COCO's everyday photos.
 #
 # You explored a detection dataset in depth in *Know Your Images*. Here we only look briefly, enough to know what the model has to learn.
 
 # %% [markdown]
-# The next cell downloads the dataset (VARIANT: size) the first time it runs; later runs reuse it.
+# The next cell downloads the dataset (about 35 MB) the first time it runs; later runs reuse it. The full dataset has 919 training and 265 validation images. To keep training short, we use a fixed random subset of 500 training and 150 validation images.
 
 # %%
 # @title Download the Dataset { display-mode: "form" }
+import random
+
+import yaml
+from huggingface_hub import list_repo_files, snapshot_download
 from ultralytics.data.utils import check_det_dataset
 
-DATASET = "medical-pills.yaml"  # VARIANT: an Ultralytics dataset name, or the data.yaml of a downloaded dataset
-
-data_info = check_det_dataset(DATASET)  # downloads and unzips on first use, then only checks
-CLASS_NAMES = [data_info["names"][k] for k in sorted(data_info["names"])]
-IMAGE_SUFFIXES = {".jpg", ".jpeg", ".png", ".bmp"}
-
-
-def images_in(folder) -> list[Path]:
-    return sorted(p for p in Path(folder).rglob("*") if p.suffix.lower() in IMAGE_SUFFIXES)
+HF_REPO = "LibreYOLO/cable-damage"  # on the Hugging Face Hub, public: no login needed
+N_TRAIN, N_VAL = (8, 4) if SMOKE else (500, 150)  # a fixed random subset keeps training short
+DATA_ROOT = Path("data/smoke" if SMOKE else "data/datasets/cable-damage").resolve()
+CLASS_NAMES = ["break", "thunderbolt"]  # a broken strand · a burn mark where electricity melted the wires
 
 
 def label_path_for(image: Path) -> Path:
@@ -33,28 +31,29 @@ def label_path_for(image: Path) -> Path:
     return Path(*parts[:i], "labels", *parts[i + 1:]).with_suffix(".txt")
 
 
-def make_smoke_subset(n_train: int = 8, n_val: int = 4) -> Path:
-    """Automated tests only: a copy of a few images and labels, with its own data.yaml."""
-    import shutil
-
-    import yaml
-
-    root = Path("data/smoke").resolve()
-    for split, source, n in (("train", data_info["train"], n_train), ("val", data_info["val"], n_val)):
-        for image in images_in(source)[:n]:
-            for src, kind in ((image, "images"), (label_path_for(image), "labels")):
-                if src.exists():
-                    (root / split / kind).mkdir(parents=True, exist_ok=True)
-                    shutil.copy(src, root / split / kind / src.name)
-    yaml_path = root / "data.yaml"
-    yaml_path.write_text(yaml.safe_dump({"path": str(root), "train": "train/images", "val": "val/images",
+def download_subset(n_train: int, n_val: int) -> Path:
+    """Download a fixed random subset (images + labels) and return the path of its data.yaml.
+    Safe to run again: files that are already there are skipped, and an interrupted download continues."""
+    repo_files = list_repo_files(HF_REPO, repo_type="dataset")
+    chosen = {}
+    for split, n in (("train", n_train), ("valid", n_val)):
+        images = sorted(f for f in repo_files if f.startswith(f"{split}/images/"))
+        chosen[split] = random.Random(SEED).sample(images, n)
+    wanted = [f for images in chosen.values() for image in images
+              for f in (image, label_path_for(Path(image)).as_posix())]
+    snapshot_download(HF_REPO, repo_type="dataset", token=False, local_dir=DATA_ROOT, allow_patterns=wanted)
+    for split, images in chosen.items():  # the lists tell Ultralytics exactly which images belong to a split
+        (DATA_ROOT / f"{split}.txt").write_text("".join(f"{DATA_ROOT / image}\n" for image in sorted(images)))
+    yaml_path = DATA_ROOT / "data.yaml"
+    yaml_path.write_text(yaml.safe_dump({"path": str(DATA_ROOT), "train": "train.txt", "val": "valid.txt",
                                          "names": dict(enumerate(CLASS_NAMES))}))
     return yaml_path
 
 
-DATA_YAML = make_smoke_subset() if SMOKE else Path(data_info["yaml_file"])
-TRAIN_IMAGES = images_in(Path(DATA_YAML).parent / "train/images") if SMOKE else images_in(data_info["train"])
-VAL_IMAGES = images_in(Path(DATA_YAML).parent / "val/images") if SMOKE else images_in(data_info["val"])
+DATA_YAML = download_subset(N_TRAIN, N_VAL)
+data_info = check_det_dataset(str(DATA_YAML))  # checks that every listed image exists
+TRAIN_IMAGES = [Path(line) for line in (DATA_ROOT / "train.txt").read_text().splitlines()]
+VAL_IMAGES = [Path(line) for line in (DATA_ROOT / "valid.txt").read_text().splitlines()]
 print(f"{len(TRAIN_IMAGES)} training images · {len(VAL_IMAGES)} validation images · classes: {', '.join(CLASS_NAMES)}")
 
 # %% [markdown]
@@ -69,11 +68,12 @@ print(f"{len(TRAIN_IMAGES)} training images · {len(VAL_IMAGES)} validation imag
 # A file `data.yaml` tells Ultralytics where the training and validation images are and what the classes are called:
 #
 # ```
-# path: VARIANT
-# train: images/train
-# val: images/val
+# path: /content/data/datasets/cable-damage
+# train: train.txt   # a list of image files; a folder of images works too
+# val: valid.txt
 # names:
-#   0: VARIANT
+#   0: break
+#   1: thunderbolt
 # ```
 #
 # The next cell prints the first lines of one label file and its image size.
