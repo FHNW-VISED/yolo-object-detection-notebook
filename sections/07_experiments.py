@@ -1,9 +1,7 @@
 # %% [markdown]
 # ## Optional Experiments
 #
-# Compare a larger model with the one we trained, and see what freezing the pretrained backbone changes.
-#
-# Both experiments train another model with the same settings as before, so each takes a few minutes on a T4. Tick the box in the next cell to run them; with the box unticked, the cells skip themselves and "Run all" stays fast.
+# Each experiment trains another model (a few minutes on a T4). Tick the box to run them; otherwise the cells skip themselves.
 
 # %%
 # ✏️ YOUR TURN: run the optional experiments?
@@ -12,17 +10,11 @@ RUN_EXPERIMENTS = False  # @param {type:"boolean"}
 # %% [markdown]
 # ### 🔴 YOLO11n vs. YOLO11s: Is the Larger Model Worth It? (Optional)
 #
-# YOLO11s has about 3.6 times as many parameters as YOLO11n.
+# YOLO11s has about 3.6 times as many parameters.
 #
-# **Before running the code:**
-# - How much better do you expect YOLO11s to be on our small dataset, and how much slower?
+# **Before running the code:** how much better and slower do you expect it to be on 500 images?
 #
-# **Explore:**
-# - Run the cell. It trains YOLO11s with your settings and compares both models on the validation images.
-#
-# **Observe and interpret:**
-# - Compare mAP@50, mAP@50–95, training time and prediction time per image.
-# - For which use would you choose each model?
+# **Observe and interpret:** compare mAP, training time and prediction time. When would you choose each?
 
 # %%
 # @title 🔎 Train YOLO11s and Compare { display-mode: "form" }
@@ -64,16 +56,11 @@ Always compare on the validation images, never on the training images.</p>
 # %% [markdown]
 # ### 🔴 Freezing the Backbone: Faster, but How Good? (Optional)
 #
-# The first layers of a YOLO model, the *backbone*, extract general image features. We can **freeze** them, so that only the later layers are trained. In YOLO11, `freeze=10` freezes the first ten layers, which is the whole backbone.
+# `freeze=10` keeps the first ten layers (the backbone, which extracts general features) fixed and trains only the rest.
 #
-# **Before running the code:**
-# - Will training be faster or slower? Will the mAP be higher or lower than without freezing?
+# **Before running the code:** faster or slower? Higher or lower mAP?
 #
-# **Explore:**
-# - Run the cell. It retrains YOLO11n with the backbone frozen and adds it to the comparison.
-#
-# **Observe and interpret:**
-# - When would freezing be a good choice?
+# **Observe and interpret:** when would freezing be a good choice?
 
 # %%
 # @title 🔎 Train YOLO11n with a Frozen Backbone { display-mode: "form" }
@@ -105,13 +92,10 @@ fine-tune the backbone as well.</p>
 # @title 📘 What Matters for Object Detection?
 callout("theory", "📘 What Matters for Object Detection?", r"""
 <ul style="margin:6px 0 0 0;padding-left:22px;">
-<li><strong>Start from pretrained weights.</strong> A few hundred images and a few minutes of fine-tuning give a
-usable detector.</li>
-<li><strong>Look at the errors, not only at the metric.</strong> False positives and false negatives show what the
-model, and sometimes the labels, get wrong.</li>
-<li><strong>Thresholds are decisions.</strong> The confidence threshold trades precision for recall; the NMS
-threshold trades duplicates for missed neighbors. Choose them for the application.</li>
-<li><strong>Report AP, not one threshold.</strong> mAP@50 says whether objects are found; mAP@50–95 also says how
-tight the boxes are.</li>
+<li><strong>Start from pretrained weights:</strong> a few hundred images give a usable detector.</li>
+<li><strong>Look at the errors</strong>, not only the metric: FPs and FNs show what the model, and sometimes the labels, get wrong.</li>
+<li><strong>Thresholds are decisions:</strong> confidence trades precision for recall, NMS trades duplicates for missed neighbors.</li>
+<li><strong>Report AP:</strong> mAP@50 says whether objects are found, mAP@50–95 also how tight the boxes are.</li>
 </ul>
 """)
+

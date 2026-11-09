@@ -1,27 +1,7 @@
 # %% [markdown]
 # ## Predictions: TP, FP and FN
 #
-# Predict with the fine-tuned model on the validation images and classify every box as a true positive, a false positive or a false negative.
-#
-# A detection metric is only a summary. Before trusting one, look at the predictions themselves: which objects the model finds, which it invents, and which it misses.
-
-# %%
-# @title 📘 True Positives, False Positives, False Negatives
-callout("theory", "📘 True Positives, False Positives, False Negatives", r"""
-<p style="margin:6px 0 0 0;">A predicted box is compared with the ground-truth boxes of the same class using the
-<strong>intersection over union (IoU)</strong>: the overlap area divided by the area the two boxes cover together
-(0 = no overlap, 1 = identical). You computed it in the optional IoU task of <em>Know Your Images</em>.</p>
-<ul style="margin:6px 0 0 0;padding-left:22px;">
-<li><span style="color:#2E7D32;font-weight:bold;">True positive (TP)</span>: a prediction that overlaps a
-ground-truth box of the same class with IoU ≥ 0.5. Each ground-truth box can be matched only once, by the most
-confident prediction.</li>
-<li><span style="color:#EF6C00;font-weight:bold;">False positive (FP)</span>: a prediction with no such match: a
-duplicate, a wrong class, a badly placed box, or an object that is not there.</li>
-<li><span style="color:#C62828;font-weight:bold;">False negative (FN)</span>: a ground-truth box that no
-prediction matched: a missed object.</li>
-</ul>
-<p style="margin:6px 0 0 0;">There are no true negatives in detection: the "background" is not a countable thing.</p>
-""")
+# A metric is only a summary. Before trusting one, look at what the model finds, invents and misses.
 
 # %%
 # @title Helpers: Matching and Drawing { display-mode: "form" }
@@ -113,7 +93,7 @@ def match_legend(fig):
 # %% [markdown]
 # ### Predict on the Validation Images
 #
-# The next cell runs the fine-tuned model on every validation image once and keeps every box with a confidence of at least `SHOW_CONF` = 0.25, the Ultralytics default for prediction. Later sections lower this threshold.
+# The next cell predicts every validation image once, keeping boxes with a confidence of at least 0.25 (the Ultralytics default).
 
 # %%
 # @title Predict on the Validation Images { display-mode: "form" }
@@ -126,17 +106,13 @@ print(f"{len(VAL_IMAGES)} validation images: {n_boxes} predicted boxes, {n_gt} g
 # %% [markdown]
 # ### 🟢 True Positives, False Positives, False Negatives: What Went Wrong?
 #
-# Each image shows the ground truth as dashed outlines and the predictions as solid boxes with their class and confidence. The colors already apply the rule from the box above.
+# A prediction is a **true positive (TP, green)** if it overlaps a ground-truth box of the same class with an IoU ≥ 0.5 (IoU: overlap area divided by the combined area, see *Know Your Images*); each ground-truth box is matched once. Any other prediction is a **false positive (FP, orange)**, and an unmatched ground-truth box is a **false negative (FN, red)**. Dashed outlines are the ground truth.
 #
-# **Before running the code:**
-# - For the weed detector, which kind of mistake do you expect more often: invented weeds (FP) or missed weeds (FN)?
-#
-# **Explore:**
-# - Browse at least ten validation images with Previous / Next.
+# **Explore:** browse at least ten validation images with Previous / Next.
 #
 # **Observe and interpret:**
-# - Find one example of each: a true positive, a false positive, a false negative.
-# - For the false positives and false negatives: why might the model have made each mistake? Look at object size, occlusion, the image edge, and whether the ground truth itself is right.
+# - Find one TP, one FP and one FN.
+# - Why might the model have made each mistake? Think of size, occlusion, the image edge, and whether the label itself is right.
 
 # %%
 # @title 🔎 Browse Predictions vs. Ground Truth { display-mode: "form" }

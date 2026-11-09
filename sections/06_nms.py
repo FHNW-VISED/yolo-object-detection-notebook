@@ -1,34 +1,16 @@
 # %% [markdown]
 # ## Non-Maximum Suppression
 #
-# See how the NMS threshold decides between duplicate boxes and missed neighbors.
-#
-# Before the confidence threshold is applied, the network proposes thousands of candidate boxes, and a well-visible object usually gets several overlapping ones. **Non-maximum suppression (NMS)** keeps one box per object:
-#
-# 1. Sort the boxes of one class by confidence.
-# 2. Keep the most confident box.
-# 3. Delete every remaining box whose IoU with the kept box is larger than the **NMS IoU threshold**.
-# 4. Repeat with the next box that is still left.
-#
-# The threshold is the `iou` argument of `predict`. This notebook uses 0.7, the value Ultralytics uses when it computes metrics (its default for plain predictions is a little lower, 0.5).
+# A well-visible object usually gets several overlapping candidate boxes. **NMS** keeps the most confident one and deletes every other box of the same class whose IoU with it is above the **NMS IoU threshold**, then repeats with the next remaining box. This notebook uses 0.7, the value Ultralytics uses for metrics (the `iou` argument of `predict`).
 
 # %% [markdown]
 # ### 🟡 NMS Threshold: Duplicates or Missed Neighbors?
 #
-# The image below is the validation image with the most annotated objects. It has about twenty weeds, spread over the whole image.
+# The validation image with the most objects: about twenty weeds. Left: the default 0.7; right: your setting.
 #
-# **Before running the code:**
-# - A *low* NMS threshold deletes boxes that overlap only a little. What could go wrong when two real objects stand side by side?
-# - A threshold of 1.0 deletes nothing. What will you see?
+# **Before running the code:** what will you see at 1.0, where nothing is deleted? And what could go wrong at a low value when two real objects touch?
 #
-# **Explore:**
-# 1. Move the `NMS IoU` slider from 0.1 to 1.0. The left panel always shows the default 0.7, the right panel your setting.
-# 2. Watch the counts of true positives, false positives and false negatives in the titles.
-#
-# **Observe and interpret:**
-# - At which values do duplicates appear (orange boxes on top of a green one)?
-# - At which values do real objects get deleted (red dashed outlines next to a green box), if any?
-# - Why does the best value depend on how crowded the scenes are?
+# **Observe and interpret:** at which values do duplicates appear (orange on top of green), and do real objects ever get deleted? Why does the best value depend on how crowded the scenes are?
 
 # %%
 # @title 🔎 Explore the NMS Threshold { display-mode: "form" }

@@ -9,3 +9,4 @@ Never edit a version folder.
 |---|---|---|---|
 | v01 | 2026-11-09 | v01: weed-crop-aerial dataset (drone, 2 classes), YOLO11n, PR/AP + NMS sliders | 2704d21 |
 | v02 | 2026-11-09 | v02: section 07 timer and frozen-backbone answer fixed after the full run | a971528 |
+| v03 | 2026-11-09 | v03: trim pass, visible text 3,221 → ~1,780 words (her original ~1,400); all tasks and answers kept | 71bd190 |
