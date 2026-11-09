@@ -15,7 +15,7 @@
 # %% [markdown]
 # ### 🟡 NMS Threshold: Duplicates or Missed Neighbors?
 #
-# The image below is the validation image with the most annotated objects, about twenty weeds spread over it.
+# The image below is the validation image with the most annotated objects: about thirty cows.
 #
 # **Before running the code:**
 # - A *low* NMS threshold deletes even slightly overlapping boxes. What could go wrong with two real objects side by side?
@@ -62,14 +62,16 @@ _ = widgets.interact(show_nms, nms_iou=widgets.FloatSlider(value=0.7, min=0.1, m
 # %%
 # @title 💡 Sample Answer { display-mode: "form" }
 callout("answer", "💡 Sample Answer", r"""
-<p><strong>Close to 1.0, duplicates appear:</strong> almost no box is deleted, so one object is covered by several
-boxes; only one of them can be the true positive, the others count as false positives. On this image the false
-positives stay at about 4 up to 0.75, then grow to over 10 at 0.85 and to more than 50 at 0.95, while the true
-positives do not change.</p>
-<p><strong>At low values nothing happens here:</strong> the red outlines and the green boxes stay the same from 0.1
-to 0.75. NMS can only delete a real neighbor when two real objects overlap, and the weeds in these images are tiny
-and stand apart, so their boxes almost never touch. In a different dataset the low end would show lost neighbors.</p>
-<p><strong>The best value depends on crowding:</strong> where objects never overlap, any value from low to about
-0.7 is safe, as here; in dense scenes (herds, shelves, crowds, weeds growing in a clump) real objects overlap, and a
-higher threshold is needed to keep them.</p>
+<p><strong>Close to 1.0, duplicates appear:</strong> almost no box is deleted, so one cow is covered by several
+boxes; only one of them can be the true positive, the others count as false positives (orange boxes stacked on a
+green one). On this image the false positives are about 4 at 0.3, 7 at the default 0.7, 15 at 0.85 and about 60 at
+0.95, while the true positives (21 of 32 cows) do not change.</p>
+<p><strong>At low values the effect is weak, but not zero:</strong> from about 0.2 to 0.5 the picture is the same,
+and only at the very bottom of the slider (0.1) does NMS start to delete real neighbors: two true positives turn into
+red dashed misses. Even in this herd, true cows' boxes never overlap by more than 0.25 IoU, so a low threshold costs
+little here. In a denser scene it would delete many more. NMS does not explain every error: the 11 missed cows in the middle of the herd and the
+two orange boxes on trees at the top left stay at every value, because they come from the model.</p>
+<p><strong>The best value depends on crowding:</strong> where objects rarely overlap, any value from about 0.3 to 0.6 is
+safe, as here; in dense scenes (herds, shelves, crowds) real objects overlap, and a higher threshold is needed to
+keep them.</p>
 """)

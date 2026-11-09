@@ -3,12 +3,12 @@
 #
 # Download the dataset, recall YOLO's label format, and look at some images and boxes.
 #
-# A drone flies low over a field and takes photos. A farmer who knows where the weeds are can spray only those spots, saving herbicide. A detector must find every weed and tell it from the crop.
+# A drone flies over a pasture and takes photos. A farmer can count the cows from the pictures instead of walking the hills. A detector must find every cow, even those standing close together.
 #
-# Our dataset has photos taken from above, with boxes around crop plants and weeds: two classes, almost all weeds. The objects are tiny, around 20 pixels wide in a 640 × 640 image, and look nothing like COCO's photos. We only look briefly here.
+# Our dataset has photos from above with a box around each cow: one class. The cows are tiny, typically under 10 pixels wide in a 640 × 640 image, often stand in herds, and look nothing like COCO's photos. We only look briefly here.
 
 # %% [markdown]
-# The next cell downloads the images (about 55 MB, one to two minutes the first time; later runs reuse them). To keep training short, we use a fixed random subset: 500 training and 150 validation images.
+# The next cell downloads the images (about 65 MB, one to two minutes the first time; later runs reuse them). To keep training short, we use a fixed random subset: 500 training and 150 validation images.
 
 # %%
 # @title Download the Dataset { display-mode: "form" }
@@ -18,7 +18,7 @@ import yaml
 from huggingface_hub import list_repo_files, snapshot_download
 from ultralytics.data.utils import check_det_dataset
 
-REPO_ID = "LibreYOLO/weed-crop-aerial"  # Roboflow 100 "weed-crop-aerial" in YOLO format, CC BY 4.0, no login needed
+REPO_ID = "LibreYOLO/aerial-cows"  # Roboflow 100 "aerial-cows" in YOLO format, CC BY 4.0, no login needed
 IMAGE_SUFFIXES = {".jpg", ".jpeg", ".png", ".bmp"}
 
 
@@ -38,7 +38,7 @@ def download_subset(n_train: int, n_val: int) -> Path:
 
     Safe to run again: a finished download is reused, an unfinished one is restarted (N-019).
     """
-    root = Path(f"data/datasets/weed-crop-aerial-{n_train}-{n_val}").resolve()
+    root = Path(f"data/datasets/aerial-cows-{n_train}-{n_val}").resolve()
     yaml_path = root / "data.yaml"
     if yaml_path.exists():  # written last, so its presence means the download finished
         return yaml_path
@@ -51,7 +51,7 @@ def download_subset(n_train: int, n_val: int) -> Path:
             chosen += [image, str(Path(image.replace("/images/", "/labels/")).with_suffix(".txt"))]
     snapshot_download(REPO_ID, repo_type="dataset", local_dir=root, allow_patterns=chosen, token=False)
     yaml_path.write_text(yaml.safe_dump({"path": str(root), "train": "train/images", "val": "valid/images",
-                                         "names": dict(enumerate(["crop", "weed"]))}))
+                                         "names": dict(enumerate(["cow"]))}))
     return yaml_path
 
 
@@ -75,12 +75,11 @@ print(f"{len(TRAIN_IMAGES)} training images · {len(VAL_IMAGES)} validation imag
 # A file `data.yaml` tells Ultralytics where the images are and what the classes are called:
 #
 # ```
-# path: /content/data/datasets/weed-crop-aerial-500-150
+# path: /content/data/datasets/aerial-cows-500-150
 # train: train/images
 # val: valid/images
 # names:
-#   0: crop
-#   1: weed
+#   0: cow
 # ```
 #
 # The next cell prints the first lines of one label file and its image size.
@@ -168,7 +167,7 @@ gt_show()
 # %% [markdown]
 # ### 🟢 Before Fine-Tuning: What Does a COCO Model See?
 #
-# The pretrained YOLO11n knows COCO's 80 everyday classes: people, cars, dogs, cups. None is one of ours.
+# The pretrained YOLO11n knows COCO's 80 everyday classes: people, cars, dogs, cups, even cows, but photographed from the side.
 #
 # **Before running the code:**
 # - What will it predict on our images: nothing, wrong classes, or our objects under another name?
@@ -196,10 +195,10 @@ show(fig)
 # %%
 # @title 💡 Sample Answer { display-mode: "form" }
 callout("answer", "💡 Sample Answer", r"""
-<p><strong>It predicts almost nothing.</strong> On the four images the COCO model finds no box at all. Over all
-150 validation images it finds a box in only about one image in ten, with the wrong kind of label: a "bird", a
-"frisbee" or a "potted plant" on a patch of soil or a leaf. None of COCO's 80 classes is a weed or a crop plant, and
-the objects are far smaller than the people and cars it knows.</p>
-<p><strong>Why fine-tune:</strong> a detector can only output the classes it was trained on. Its features (edges,
-textures, shapes) are still useful, so we keep them and teach the last layers our classes.</p>
+<p><strong>It finds almost none of our cows.</strong> On the four images the COCO model finds no box at all. Over all
+150 validation images it draws only about 170 boxes for roughly 1,400 cows, in about one image in three. Most carry
+the wrong label: a "person" or a "bird" on a speck of a cow seen from above. Only a handful say "cow". COCO does
+have a cow class, but its cows are large and photographed from the side; ours are a few pixels wide.</p>
+<p><strong>Why fine-tune:</strong> a detector can only find what it was trained to see. Its features (edges,
+textures, shapes) are still useful, so we keep them and teach the last layers our cows from above.</p>
 """)

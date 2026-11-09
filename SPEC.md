@@ -43,11 +43,12 @@ Decided per **variant** (see §11). Each variant names: the dataset, its source 
 classes, how it is fetched in Colab (no login), and its SMOKE subset (a few train and val images, `imgsz` 160,
 one epoch on CPU). The dataset is never committed (N-019); `data/` holds only small manifests if any.
 
-**Variant weed-crop-aerial** (drone camera, agriculture; story: a drone maps weeds for targeted spraying).
-- Dataset: Roboflow 100 "weed-crop-aerial" via https://huggingface.co/datasets/LibreYOLO/weed-crop-aerial, CC BY 4.0, YOLO txt, 640 × 640 px.
-- Classes: crop, weed (crop is about 5 % of the boxes, about 2 % in the validation subset). Boxes are small: median about 17 × 27 px, √area about 21 px. Training at 640 px; larger `imgsz` would help the smallest weeds but costs time.
-- Splits in the source: 823 train / 235 valid / 118 test. We use a fixed random sample (seed 42) of 500 train and 150 valid images; the test split is not used.
-- Fetch in Colab (no login): `huggingface_hub.snapshot_download` of only the sampled images and labels (about 53 MB, 1 to 2 minutes), then a local `data.yaml`. Idempotent: a finished download is reused.
+**Variant aerial-cows** (drone camera, livestock; story: a drone counts cows on a pasture; crowded scenes).
+- Dataset: Roboflow 100 "aerial-cows" via https://huggingface.co/datasets/LibreYOLO/aerial-cows, CC BY 4.0, YOLO txt, 640 × 640 px. Drone photos of pasture; no people visible.
+- Classes: one, `cow`. Boxes are tiny: median about 7.5 × 14 px; up to about 33 cows in one image, often in herds. Training at 640 px; larger `imgsz` would help but costs time.
+- Crowding: this variant exists to give the NMS slider real overlapping neighbors. Measured on the validation labels (same-class box pairs with IoU > 0.3): only 4.4 % of the 340 validation images have such a pair (4.7 % in our 150-image subset), at most 4 pairs in one image. This is below the planned bar of 10 % of images; see `build/variant/crowding.txt`.
+- Splits in the source: 1084 train / 340 valid / 299 test. We use a fixed random sample (seed 42) of 500 train and 150 valid images; the test split is not used.
+- Fetch in Colab (no login): `huggingface_hub.snapshot_download` of only the sampled images and labels (about 62 MB, 1 to 2 minutes), then a local `data.yaml`. Idempotent: a finished download is reused.
 - SMOKE subset: 8 train and 4 valid images through the same code, `imgsz` 160, one epoch on CPU.
 
 ## 4b. Length

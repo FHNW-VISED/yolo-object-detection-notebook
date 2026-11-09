@@ -129,7 +129,7 @@ print(f"{len(VAL_IMAGES)} validation images: {n_boxes} predicted boxes, {n_gt} g
 # Each image shows the ground truth as dashed outlines and the predictions as solid boxes with class and confidence, colored by the rule above.
 #
 # **Before running the code:**
-# - Which mistake do you expect more often: invented weeds (FP) or missed weeds (FN)?
+# - Which mistake do you expect more often: invented cows (FP) or missed cows (FN)?
 #
 # **Explore:**
 # - Browse at least ten validation images (Previous / Next).
@@ -174,13 +174,11 @@ browse_show()
 # %%
 # @title 💡 Sample Answer { display-mode: "form" }
 callout("answer", "💡 Sample Answer", r"""
-<p><strong>True positives</strong> are weeds that stand out from bare soil: a small green plant with nothing else
-around it. At confidence 0.25 the model finds roughly four out of five of the labeled objects.</p>
-<p><strong>False positives are more frequent than false negatives</strong>, about three times as many. Almost all
-of them are small spots with no label nearby, not duplicates: tiny seedlings, leaf fragments, straw or dark patches
-of soil. Many look like the objects that <em>are</em> labeled, so the labeling is possibly incomplete there and the
-model right; only a look at the image can tell.</p>
-<p><strong>False negatives</strong> are mostly the smallest objects (about 17 pixels across, against about 21 for
-all objects), weeds that look unlike the typical small seedling (for example one much larger than the others), and
-weeds in a planter between similar-looking crop seedlings.</p>
+<p><strong>True positives</strong> are cows that stand out from the grass: a dark or white speck with a shadow, with
+a little gap around it. At confidence 0.25 the model finds roughly two out of three of the labeled cows.</p>
+<p><strong>False positives are more frequent than false negatives</strong>, about 1.5 times as many (roughly 600
+against 450 over all validation images). About one in five is a duplicate, a second box on a cow that is already
+found. The rest are dark trees and bushes, boxes shifted too far for IoU 0.5, or cows the labelers skipped.</p>
+<p><strong>False negatives</strong> are mostly the smallest cows (about 5 pixels across, against about 7–8 for all
+cows) and cows standing shoulder to shoulder in a herd, where neighbors blur into one dark patch.</p>
 """)
