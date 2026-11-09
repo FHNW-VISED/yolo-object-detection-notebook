@@ -1,5 +1,5 @@
 """Versions of the notebook (Simone, 2026-10-22): one folder per version in versions/, holding SPEC.md and the
-built notebook(s) at the repo root as they were. The newest folder always equals what is on main.
+built notebook as they were. The newest folder always equals what is on main.
 
     python scripts/version.py new "What changed"   # snapshot SPEC.md + the notebook as the next version
     python scripts/version.py check                 # fail if the newest version differs from them
@@ -28,9 +28,10 @@ Never edit a version folder.
 
 
 def notebooks(root: Path) -> list[Path]:
+    """Every built notebook at the repo root (one per Edition)."""
     found = sorted(root.glob("*.ipynb"))
     if not found:
-        sys.exit("no notebook (*.ipynb) at the repo root")
+        sys.exit("expected at least one notebook at the repo root, found none")
     return found
 
 

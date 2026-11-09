@@ -19,6 +19,19 @@ NOTEBOOK = ROOT / "yolo-object-detection-notebook.ipynb"
 
 
 def main() -> int:
+    tagged = [
+        p.name for p in sorted((ROOT / "sections").glob("[0-9][0-9]_*.py")) if "edition=" in p.read_text()
+    ]
+    if tagged:  # an Edition holds only some cells: splitting it back would delete the other Edition's cells
+        print(
+            "refusing to split: these sections have cells for one Edition only, which a copy of the other "
+            "Edition "
+            f"does not contain: {', '.join(tagged)}. Port the copy's changes into sections/ by hand "
+            "(or with an "
+            "agent), cell by cell.",
+            file=sys.stderr,
+        )
+        return 1
     nb = nbformat.read(sys.argv[1] if len(sys.argv) > 1 else NOTEBOOK, as_version=4)
     groups: OrderedDict[str, list] = OrderedDict()
     current = None

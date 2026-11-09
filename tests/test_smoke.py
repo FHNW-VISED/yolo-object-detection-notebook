@@ -23,24 +23,25 @@ CELL_TIMEOUT_S = int(os.environ.get("NB_CELL_TIMEOUT", "300"))
 TOTAL_BUDGET_S = int(os.environ.get("NB_SMOKE_BUDGET", "900"))
 DUMP_RESULTS = (
     "import json, pathlib\n"
-    "if 'RESULTS' in globals():\n"
+    "if 'results' in globals():\n"
     "    pathlib.Path('build').mkdir(exist_ok=True)\n"
-    "    pathlib.Path('build/smoke-results.json').write_text(json.dumps(RESULTS, default=str))\n"
+    "    pathlib.Path('build/smoke-results.json').write_text(json.dumps(results, default=str))\n"
 )
 
 
-def test_notebook_runs_in_smoke_mode():
-    assert NOTEBOOK.exists(), "run `just build` first"
-    nb = nbformat.read(NOTEBOOK, as_version=4)
-    # Test-only cell (never in the student notebook): dump RESULTS for tests/test_content.py.
-    nb.cells.append(nbformat.v4.new_code_cell(DUMP_RESULTS))
+def run_smoke(nb: nbformat.NotebookNode, executed: Path) -> tuple[str | None, int | None, float]:
+    """Execute `nb` headless with NB_SMOKE=1 and save it to `executed`.
+
+    Returns (failure message or None, index of the failing cell or None, seconds). The message names the
+    section, the cell index and the tail of the traceback only, so the output an agent reads stays short.
+    """
     os.environ["NB_SMOKE"] = "1"
     os.environ.setdefault("MPLBACKEND", "Agg")
     client = NotebookClient(
         nb, timeout=CELL_TIMEOUT_S, kernel_name="python3", resources={"metadata": {"path": str(ROOT)}}
     )
     start = time.monotonic()
-    failure = None
+    failure, failing = None, None
     try:
         client.execute()
     except CellExecutionError as err:
@@ -61,9 +62,17 @@ def test_notebook_runs_in_smoke_mode():
         plain = re.sub(r"\x1b\[[0-9;]*m", "", str(err))  # no colour codes: agents read this
         failure = f"smoke run failed in {where}:\n" + "\n".join(plain.strip().splitlines()[-25:])
     finally:
-        EXECUTED.parent.mkdir(exist_ok=True)
-        nbformat.write(nb, EXECUTED)
+        executed.parent.mkdir(exist_ok=True)
+        nbformat.write(nb, executed)
+    return failure, failing, time.monotonic() - start
+
+
+def test_notebook_runs_in_smoke_mode():
+    assert NOTEBOOK.exists(), "run `just build` first"
+    nb = nbformat.read(NOTEBOOK, as_version=4)
+    # Test-only cell (never in the student notebook): dump results for tests/test_content.py.
+    nb.cells.append(nbformat.v4.new_code_cell(DUMP_RESULTS))
+    failure, _, elapsed = run_smoke(nb, EXECUTED)
     if failure:  # outside the except block, so pytest prints only this clean message
         pytest.fail(failure, pytrace=False)
-    elapsed = time.monotonic() - start
     assert elapsed < TOTAL_BUDGET_S, f"smoke run took {elapsed:.0f}s > budget {TOTAL_BUDGET_S}s (N-015)"

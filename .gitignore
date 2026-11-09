@@ -5,3 +5,8 @@ __pycache__/
 build/
 data/cache/
 .DS_Store
+# Ultralytics: downloaded weights, run folders, datasets (never in git, N-019)
+*.pt
+runs/
+data/smoke/
+data/datasets/

@@ -63,12 +63,11 @@ def test_check_passes_only_when_latest_equals_current(tmp_path):
     assert "just version" in r.stdout + r.stderr
 
 
-def test_every_root_notebook_is_versioned(tmp_path):
+def test_new_version_copies_every_edition(tmp_path):
     root = make_repo(tmp_path)
-    (root / "setup_check.ipynb").write_text('{"cells": ["setup"]}\n')
-    run(root, "new", "Two notebooks", "--date", "2026-10-22")
-    v = root / "versions" / "v01-2026-10-22-two-notebooks"
-    assert (v / "demo.ipynb").exists() and (v / "setup_check.ipynb").exists()
-    assert run(root, "check").returncode == 0
-    (root / "setup_check.ipynb").write_text('{"cells": ["changed"]}\n')
-    assert run(root, "check").returncode == 1
+    (root / "own.ipynb").write_text('{"cells": [2]}\n')
+    assert run(root, "new", "two editions", "--date", "2026-10-28").returncode == 0
+    v = next((root / "versions").glob("v01-*"))
+    assert (v / "demo.ipynb").exists() and (v / "own.ipynb").read_text() == '{"cells": [2]}\n'
+    (root / "own.ipynb").write_text('{"cells": [3]}\n')
+    assert run(root, "check").returncode == 1  # a change in either Edition needs a new version
