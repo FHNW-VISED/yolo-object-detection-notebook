@@ -272,9 +272,9 @@ def main() -> int:
     if files and not smoke_defined:
         fail("sections", "no cell defines SMOKE = ... (N-014)")
 
+    check_total_budget(all_cells)
     for p in problems:
         print(p)
-    check_total_budget(all_cells)
     for w in warnings:
         print(w)
     print(f"lint: {len(files)} sections, {expected_q - 1} questions, {len(problems)} problems")
