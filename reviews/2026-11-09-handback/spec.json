@@ -93,14 +93,14 @@
  {
   "html": "after.html",
   "cells": [
-   11,
-   12
+   12,
+   13
   ],
   "out": "a-data.png",
   "marks": [
    {
-    "cell": 11,
-    "text": "spray only those spots",
+    "cell": 12,
+    "text": "counting grape bunches",
     "label": "1",
     "open": false
    }
@@ -110,8 +110,8 @@
  {
   "html": "after.html",
   "cells": [
-   18,
-   18
+   19,
+   19
   ],
   "out": "a-gt.png",
   "marks": [],
@@ -120,13 +120,13 @@
  {
   "html": "after.html",
   "cells": [
-   19,
-   20
+   20,
+   21
   ],
   "out": "a-coco.png",
   "marks": [
    {
-    "cell": 19,
+    "cell": 20,
     "text": "What Does a COCO Model See?",
     "label": "2",
     "open": false
@@ -171,14 +171,14 @@
  {
   "html": "after.html",
   "cells": [
-   11,
-   11
+   12,
+   12
   ],
   "out": "a-explore.png",
   "marks": [
    {
-    "cell": 11,
-    "text": "We only look briefly here",
+    "cell": 12,
+    "text": "Dataset exploration is in",
     "label": "1",
     "open": false
    }
@@ -211,13 +211,13 @@
  {
   "html": "after.html",
   "cells": [
-   23,
-   24
+   25,
+   26
   ],
   "out": "a-train.png",
   "marks": [
    {
-    "cell": 23,
+    "cell": 25,
     "text": "How Long and How Big?",
     "label": "1",
     "open": false
@@ -228,13 +228,13 @@
  {
   "html": "after.html",
   "cells": [
-   29,
-   29
+   31,
+   31
   ],
   "out": "a-curves.png",
   "marks": [
    {
-    "cell": 29,
+    "cell": 31,
     "text": null,
     "label": "2",
     "open": false
@@ -268,14 +268,14 @@
  {
   "html": "after.html",
   "cells": [
-   35,
-   36
+   39,
+   40
   ],
   "out": "a-tpfp.png",
   "marks": [
    {
-    "cell": 35,
-    "text": "Find one TP, one FP and one FN",
+    "cell": 39,
+    "text": "Find one example of each",
     "label": "1",
     "open": false
    }
@@ -285,13 +285,13 @@
  {
   "html": "after.html",
   "cells": [
-   42,
-   43
+   46,
+   47
   ],
   "out": "a-pr.png",
   "marks": [
    {
-    "cell": 42,
+    "cell": 46,
     "text": "Precision or Recall?",
     "label": "1",
     "open": false
@@ -302,19 +302,19 @@
  {
   "html": "after.html",
   "cells": [
-   46,
-   48
+   50,
+   52
   ],
   "out": "a-ap.png",
   "marks": [
    {
-    "cell": 46,
+    "cell": 50,
     "text": null,
     "label": "2",
     "open": false
    },
    {
-    "cell": 48,
+    "cell": 52,
     "text": null,
     "label": "3",
     "open": false
@@ -325,8 +325,8 @@
  {
   "html": "after.html",
   "cells": [
-   52,
-   52
+   56,
+   56
   ],
   "out": "a-nms.png",
   "marks": [],
@@ -352,13 +352,13 @@
  {
   "html": "after.html",
   "cells": [
-   56,
-   57
+   60,
+   61
   ],
   "out": "a-ns.png",
   "marks": [
    {
-    "cell": 56,
+    "cell": 60,
     "text": "Is the Larger Model Worth It?",
     "label": "1",
     "open": false

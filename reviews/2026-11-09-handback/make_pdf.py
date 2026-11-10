@@ -18,9 +18,9 @@ PAGES = [
      "8.4.208) on Colab's current runtime, and training, validation and prediction are each one Python call. "
      "Drive and Weights & Biases are no longer needed; the training curves are drawn in the notebook.",
      ["b-setup.png", "b-clone.png"], ["a-setup.png", "a-models.png"], None),
-    ("2 · A new dataset, from outside COCO", "Cattle from a drone became weeds and crop plants from a drone "
-     "(Roboflow-100 \"weed-crop-aerial\", CC BY 4.0, downloaded from Hugging Face without a login). We train on a "
-     "fixed subset of 500 training and 150 validation images. A new first task shows what the COCO model predicts "
+    ("2 · A new dataset, from outside COCO", "Cattle from a drone became grape bunches in a vineyard (Embrapa WGISD, CC BY-NC 4.0, so free for teaching): "
+     "242 training and 58 validation images, one class. The bunches are large and hang side by side, which the NMS part "
+     "needs. The images come straight from the dataset's GitHub page (about 300 MB, no login). A new first task shows what the COCO model predicts "
      "before fine-tuning, which motivates the training.",
      ["b-data.png"], ["a-data.png", "a-gt.png", "a-coco.png"], None),
     ("3 · Dataset exploration: one short look", "Your qualitative and quantitative analysis tasks are covered by "
@@ -39,14 +39,14 @@ PAGES = [
     ("7 · New: AP, mAP@50 and mAP@50–95", "AP drawn as the shaded area under each class's curve, checked against "
      "Ultralytics' own value; then AP at the ten IoU thresholds whose mean is mAP@50–95, with a task on what each "
      "metric rewards.", None, ["a-ap.png"], "New in this version"),
-    ("8 · New: the NMS slider", "The validation image with the most objects, at the default NMS IoU of 0.7 next to "
-     "the student's setting. Shown at 0.95: duplicates appear (false positives 3 → 58). At 0.3 nothing changes on this dataset, because "
-     "the weeds rarely overlap; the task and its Sample Answer say so, so the 'lost neighbors' side of NMS is only described "
-     "here, not seen. A crowded dataset (the aerial-cows variant) would show both sides.",
+    ("8 · New: the NMS slider", "The validation image with the most objects (27 grape bunches), at the default NMS IoU of 0.7 "
+     "next to the student's setting. Shown at 0.95: duplicates appear (false positives 2 → 58). At 0.3 the two false "
+     "positives go and no real bunch is lost, so the 'lost neighbors' side of NMS is explained in the Sample Answer rather "
+     "than seen.",
      None, ["a-nms.png"], "New in this version"),
     ("9 · YOLOv7-tiny became YOLO11n vs YOLO11s (optional)", "Both optional experiments stay behind one checkbox, "
-     "so Run all stays fast. In our run YOLO11s was about as good as YOLO11n on 500 images (mAP@50 0.82 vs 0.83, "
-     "mAP@50–95 0.52 vs 0.50) and took 1.6 times as long; freezing the backbone lowered mAP@50 to 0.75.",
+     "so Run all stays fast. In our run YOLO11s was clearly better (mAP@50 0.90 vs 0.86, mAP@50–95 0.59 vs 0.54) "
+     "and took about 1.5 times as long; freezing the backbone lowered mAP@50 to 0.81 and trained fastest.",
      ["b-tiny.png"], ["a-ns.png"], None),
 ]
 SUMMARY = """
@@ -54,9 +54,9 @@ SUMMARY = """
 TP/FP/FN, optional experiments) and your tasks with Sample Answers, on YOLO11 and the Ultralytics Python API, with
 a new dataset and two new interactive parts. Each page shows your version on the left and the new one on the
 right; the red numbers mark the exact place.</p>
-<p><b>Is it shorter?</b> A little longer than yours, for the new parts you asked for: about 1,780 visible words instead of 1,400 (1.26 times), 62 cells instead of 90, and 1 shell command instead of 23. The Sample Answers (about 1,300 words) are hidden in toggles.</p>
+<p><b>Is it shorter?</b> In cells and commands, yes: 66 cells instead of 90, 1 shell command instead of 23. In reading, it is longer: about 2,300 visible words instead of 1,400 (1.6 times), because the precision–recall, AP and NMS parts are new and every task keeps your full structure (Before running the code, Explore, Observe and interpret). The Sample Answers are hidden in toggles.</p>
 <p><b>Tested:</b> runs top to bottom headless (CPU smoke test, every check passing) and once in full on a Mac:
-YOLO11n trained 20 epochs in 7.5 minutes there, mAP@50 0.83, mAP@50–95 0.50; the whole notebook including both optional experiments ran in 45 minutes without an error. A full run in Colab on a T4 is still to do.
+YOLO11n trained 20 epochs in about 4 minutes there, mAP@50 0.86, mAP@50–95 0.54. A full run in Colab on a T4 is still to do.
 Why YOLO11 and not the newer YOLO26: on Ultralytics' own 37-dataset fine-tuning benchmark YOLO11n scores slightly
 higher (46.4 vs 44.4 mAP@50–95), and its classic pipeline shows the NMS step the slider explores.</p>
 """
