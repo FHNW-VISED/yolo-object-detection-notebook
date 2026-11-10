@@ -15,3 +15,4 @@ Never edit a version folder.
 | v06 | 2026-11-10 | v05-grapes: same notebook on the WGISD grape bunches | b4b81b3 |
 | v07 | 2026-11-10 | v07: quiet Ultralytics output; one line per epoch; model card before each training | ab7ee48 |
 | v08 | 2026-11-10 | v08: per-epoch line printed once | 31532a3 |
+| v09 | 2026-11-10 | v09: Mac-only PyTorch warning silenced in the training cell | 83476e7 |

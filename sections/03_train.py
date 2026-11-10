@@ -109,6 +109,9 @@ def train_with_summary(model, name: str, **settings) -> float:
     return (time.time() - start) / 60
 
 
+import warnings
+
+warnings.filterwarnings("ignore", message=".*does not have a deterministic implementation.*")  # Mac GPU only
 model = YOLO("yolo11n.pt")  # COCO-pretrained weights, downloaded on first use
 describe(model, "YOLO11n")
 train_minutes_n = train_with_summary(model, "yolo11n", **train_settings)
