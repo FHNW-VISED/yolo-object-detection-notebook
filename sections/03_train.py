@@ -94,7 +94,7 @@ def train_with_summary(model, name: str, **settings) -> float:
     start, printed = time.time(), set()
 
     def epoch_line(trainer):
-        if trainer.epoch in printed:  # Ultralytics calls this once more after its final validation
+        if trainer.epoch in printed or trainer.epoch >= trainer.epochs:  # once more after the final validation
             return
         printed.add(trainer.epoch)
         m, loss = trainer.metrics, trainer.label_loss_items(trainer.tloss, prefix="train")
