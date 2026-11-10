@@ -13,3 +13,4 @@ Never edit a version folder.
 | v04 | 2026-11-09 | v04: runs on a Mac's GPU (MPS) when no CUDA GPU is found | d840600 |
 | v05 | 2026-11-09 | v05: her full structure restored (every task, label and box from v02), sentences shortened | 2ca346b |
 | v06 | 2026-11-10 | v05-grapes: same notebook on the WGISD grape bunches | b4b81b3 |
+| v07 | 2026-11-10 | v07: quiet Ultralytics output; one line per epoch; model card before each training | ab7ee48 |

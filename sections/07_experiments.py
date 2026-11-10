@@ -38,9 +38,8 @@ def evaluate(weights) -> dict:
 
 if RUN_EXPERIMENTS or SMOKE:  # smoke mode runs the same code with tiny settings
     model_s = YOLO("yolo11s.pt")
-    start = time.time()
-    model_s.train(name="yolo11s", **train_settings)
-    train_minutes_s = (time.time() - start) / 60
+    describe(model_s, "YOLO11s")
+    train_minutes_s = train_with_summary(model_s, "yolo11s", **train_settings)
     comparison = pd.DataFrame({
         "YOLO11n": {**evaluate(best_weights), "training minutes": round(train_minutes_n, 1)},
         "YOLO11s": {**evaluate(model_s.trainer.best), "training minutes": round(train_minutes_s, 1)},
@@ -79,9 +78,8 @@ and the time per image does not. Always compare on the validation images, never 
 # @title 🔎 Train YOLO11n with a Frozen Backbone { display-mode: "form" }
 if RUN_EXPERIMENTS or SMOKE:
     model_frozen = YOLO("yolo11n.pt")
-    start = time.time()
-    model_frozen.train(name="yolo11n-frozen", freeze=10, **train_settings)
-    train_minutes_frozen = (time.time() - start) / 60
+    describe(model_frozen, "YOLO11n, first 10 layers frozen")
+    train_minutes_frozen = train_with_summary(model_frozen, "yolo11n-frozen", freeze=10, **train_settings)
     comparison["YOLO11n, frozen backbone"] = {**evaluate(model_frozen.trainer.best),
                                               "training minutes": round(train_minutes_frozen, 1)}
     display(comparison)

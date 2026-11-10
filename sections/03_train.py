@@ -77,10 +77,41 @@ train_settings = dict(
     plots=not SMOKE,
 )
 
+from ultralytics.utils.torch_utils import get_flops
+
+
+def describe(model, title: str) -> None:
+    """A short model card: what is being fine-tuned, how large it is, and what changes for our dataset."""
+    n_params = sum(p.numel() for p in model.model.parameters())
+    print(f"{title}: {len(list(model.model.modules()))} layers · {n_params / 1e6:.1f} M parameters · "
+          f"{get_flops(model.model, imgsz=640):.1f} GFLOPs at 640 px")
+    print(f"  pretrained on COCO ({len(model.names)} classes) → fine-tuned for {len(CLASS_NAMES)} class(es): "
+          f"{', '.join(CLASS_NAMES)}")
+
+
+def train_with_summary(model, name: str, **settings) -> float:
+    """Train, printing one line per epoch instead of Ultralytics' long log. Returns the minutes it took."""
+    start, printed = time.time(), set()
+
+    def epoch_line(trainer):
+        if trainer.epoch in printed:  # Ultralytics calls this once more after its final validation
+            return
+        printed.add(trainer.epoch)
+        m, loss = trainer.metrics, trainer.label_loss_items(trainer.tloss, prefix="train")
+        box, cls = float(loss.get("train/box_loss", 0)), float(loss.get("train/cls_loss", 0))
+        print(f"epoch {trainer.epoch + 1:>2}/{trainer.epochs} · train loss box {box:.2f} cls {cls:.2f} · "
+              f"val mAP@50 {m.get('metrics/mAP50(B)', 0):.2f} · mAP@50–95 {m.get('metrics/mAP50-95(B)', 0):.2f} · "
+              f"{time.time() - start:.0f} s", flush=True)
+
+    model.add_callback("on_fit_epoch_end", epoch_line)
+    print("One line per epoch: the training losses (lower is better) and the validation mAP (higher is better).")
+    model.train(name=name, **settings)
+    return (time.time() - start) / 60
+
+
 model = YOLO("yolo11n.pt")  # COCO-pretrained weights, downloaded on first use
-start = time.time()
-model.train(name="yolo11n", **train_settings)
-train_minutes_n = (time.time() - start) / 60
+describe(model, "YOLO11n")
+train_minutes_n = train_with_summary(model, "yolo11n", **train_settings)
 best_weights = Path(model.trainer.best)  # the epoch with the best validation fitness
 print(f"\nTraining took {train_minutes_n:.1f} min. Best weights: {best_weights}")
 

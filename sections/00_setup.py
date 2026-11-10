@@ -85,6 +85,8 @@ if IN_COLAB:  # Jupytext turns the commented magic below into a real `%pip insta
     pass
     # %pip install -q ultralytics==8.4.208
 
+os.environ.setdefault("YOLO_VERBOSE", "False")  # Ultralytics' own log lines and progress bars off; the notebook prints short summaries
+
 import ipywidgets as widgets
 import matplotlib as mpl
 import matplotlib.patheffects as path_effects
