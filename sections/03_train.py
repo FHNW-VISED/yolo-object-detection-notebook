@@ -28,7 +28,7 @@ into one), so the model rarely sees the same picture twice.</li>
 # - Will you need more or fewer epochs than for COCO? Why?
 #
 # **Explore:**
-# 1. Set `EPOCHS` (5 to 50) and `BATCH_SIZE` (8, 16 or 32; a T4 handles 16) in the cell below. Each extra 10 epochs costs about three minutes on a T4.
+# 1. Set `EPOCHS` (5 to 50) and `BATCH_SIZE` (8, 16 or 32; a T4 handles 16) in the cell below. Each extra 10 epochs costs about two minutes on a T4.
 # 2. Run the training cell after it.
 #
 # **Observe and interpret:**
@@ -47,10 +47,10 @@ print(f"Training for {EPOCHS} epochs with batches of {BATCH_SIZE} images at {IMG
 # %%
 # @title 💡 Sample Answer { display-mode: "form" }
 callout("answer", "💡 Sample Answer", r"""
-<p><strong>Far fewer epochs than for COCO.</strong> The model starts from pretrained weights and has only 500
-training images, so 20 epochs take a few minutes and already give a usable detector. For these tiny objects the
-model is still improving slowly at epoch 20, so 30 epochs may add a little mAP, at the price of about three more
-minutes on a T4.</p>
+<p><strong>Far fewer epochs than for COCO.</strong> The model starts from pretrained weights and has only 242
+training images, so 20 epochs take a few minutes and already give a usable detector. The model is still improving
+slowly at epoch 20, so 30 epochs may add a point or two of mAP, at the price of about one more minute or two
+on a T4.</p>
 <p><strong>Batch size 16</strong> fits comfortably in a T4's memory for YOLO11n at 640 px. Smaller batches also
 work but each epoch takes longer; 32 may run out of memory for the larger YOLO11s.</p>
 """)
@@ -58,7 +58,7 @@ work but each epoch takes longer; 32 may run out of memory for the larger YOLO11
 # %% [markdown]
 # ### Train
 #
-# The next cell fine-tunes YOLO11n and prints one line per epoch: training losses, then precision, recall and mAP on the validation images. **The first epoch is the slowest**, because the images are cached. On a T4 the default run takes 6 to 8 minutes.
+# The next cell fine-tunes YOLO11n and prints one line per epoch: training losses, then precision, recall and mAP on the validation images. **The first epoch is the slowest**, because the images are cached. On a T4 the default run takes about 4 to 6 minutes.
 
 # %%
 # @title Train YOLO11n { display-mode: "form" }
@@ -116,9 +116,10 @@ show(fig)
 callout("answer", "💡 Sample Answer", r"""
 <p><strong>Both losses fall steadily and are still falling at the end.</strong> The training and validation loss
 move together, with no gap that grows, so the model is not overfitting yet.</p>
-<p><strong>The validation mAP is noisy at first</strong> and can jump up or down by 0.1 or more between epochs,
-because the validation set is small. It settles in the last five epochs at roughly 0.7–0.8 (mAP@50) and 0.4–0.5 (mAP@50–95)
-and is still creeping up: 30 epochs would probably add a few points, but not change the picture.</p>
+<p><strong>The validation mAP climbs fast, then flattens.</strong> It starts around 0.3–0.4 (mAP@50) after the first
+epoch, reaches about 0.8 by epoch 10, and wobbles by a few hundredths between epochs because the validation set is
+small (58 images). In the last five epochs it sits at roughly 0.85–0.87 (mAP@50) and 0.52–0.55 (mAP@50–95), still
+creeping up: 30 epochs would probably add a point or two, but not change the picture.</p>
 <p><strong>A warning sign would be</strong> a training loss that keeps falling while the validation loss rises:
 the model then memorizes the training images (overfitting), and fewer epochs or more augmentation would help.</p>
 """)

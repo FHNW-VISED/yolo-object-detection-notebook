@@ -43,12 +43,14 @@ Decided per **variant** (see §11). Each variant names: the dataset, its source 
 classes, how it is fetched in Colab (no login), and its SMOKE subset (a few train and val images, `imgsz` 160,
 one epoch on CPU). The dataset is never committed (N-019); `data/` holds only small manifests if any.
 
-**Variant weed-crop-aerial** (drone camera, agriculture; story: a drone maps weeds for targeted spraying).
-- Dataset: Roboflow 100 "weed-crop-aerial" via https://huggingface.co/datasets/LibreYOLO/weed-crop-aerial, CC BY 4.0, YOLO txt, 640 × 640 px.
-- Classes: crop, weed (crop is about 5 % of the boxes, about 2 % in the validation subset). Boxes are small: median about 17 × 27 px, √area about 21 px. Training at 640 px; larger `imgsz` would help the smallest weeds but costs time.
-- Splits in the source: 823 train / 235 valid / 118 test. We use a fixed random sample (seed 42) of 500 train and 150 valid images; the test split is not used.
-- Fetch in Colab (no login): `huggingface_hub.snapshot_download` of only the sampled images and labels (about 53 MB, 1 to 2 minutes), then a local `data.yaml`. Idempotent: a finished download is reused.
-- SMOKE subset: 8 train and 4 valid images through the same code, `imgsz` 160, one epoch on CPU.
+**Variant grapes** (vineyard, agriculture; story: a vineyard counts grape bunches in photos of each vine row to estimate the harvest; bunches hang side by side and hide each other).
+- Why this variant: on the weeds and cows datasets the objects are tiny and rarely touch, so the NMS slider only shows duplicates. Grape bunches are larger (box side about 10 % of the image) and often touch, so NMS can also delete real neighbors.
+- Dataset: Embrapa WGISD (Wine Grape Instance Segmentation Dataset), https://github.com/thsant/wgisd, DOI 10.5281/zenodo.3361736, **CC BY-NC 4.0** (non-commercial teaching use is fine). Boxes are already in YOLO txt format.
+- Attribution (repo only, N-045): Santos et al., "Grape detection, segmentation and tracking using deep neural networks and three-dimensional association", Computers and Electronics in Agriculture 170, 2020, and the dataset DOI above.
+- Classes: one, `grape` (a grape bunch).
+- Splits: the repo's `train.txt` (242 images) and `test.txt` (58 images); the test list is used as validation.
+- Fetch in Colab (no login): only the listed `.jpg` + `.txt` files from `raw.githubusercontent.com/thsant/wgisd/master/data/` (never clone the repo: 1.4 GB of masks), 16 parallel workers, idempotent (`.part` files, finished files skipped), about 300 MB in 1 to 2 minutes. Each image is then resized so its longer side is 640 px (labels are normalized, so they stay valid) into a YOLO folder with its own `data.yaml` (`names: {0: grape}`).
+- SMOKE subset: the first 8 train and 4 valid names through the same code, `imgsz` 160, one epoch on CPU.
 
 ## 4b. Length
 **Word budget:** 2300

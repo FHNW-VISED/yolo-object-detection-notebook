@@ -15,7 +15,7 @@
 # %% [markdown]
 # ### 🟡 NMS Threshold: Duplicates or Missed Neighbors?
 #
-# The image below is the validation image with the most annotated objects, about twenty weeds spread over it.
+# The image below is the validation image with the most annotated objects, 27 grape bunches, many of them touching.
 #
 # **Before running the code:**
 # - A *low* NMS threshold deletes even slightly overlapping boxes. What could go wrong with two real objects side by side?
@@ -64,12 +64,13 @@ _ = widgets.interact(show_nms, nms_iou=widgets.FloatSlider(value=0.7, min=0.1, m
 callout("answer", "💡 Sample Answer", r"""
 <p><strong>Close to 1.0, duplicates appear:</strong> almost no box is deleted, so one object is covered by several
 boxes; only one of them can be the true positive, the others count as false positives. On this image the false
-positives stay at about 4 up to 0.75, then grow to over 10 at 0.85 and to more than 50 at 0.95, while the true
-positives do not change.</p>
-<p><strong>At low values nothing happens here:</strong> the red outlines and the green boxes stay the same from 0.1
-to 0.75. NMS can only delete a real neighbor when two real objects overlap, and the weeds in these images are tiny
-and stand apart, so their boxes almost never touch. In a different dataset the low end would show lost neighbors.</p>
-<p><strong>The best value depends on crowding:</strong> where objects never overlap, any value from low to about
-0.7 is safe, as here; in dense scenes (herds, shelves, crowds, weeds growing in a clump) real objects overlap, and a
-higher threshold is needed to keep them.</p>
+positives are 0 to 2 up to 0.7, then grow to about 15 at 0.85, to about 60 at 0.95 and to over 150 at 1.0, while
+the true positives do not change (about 24 of 27): the orange boxes pile up on top of the green ones.</p>
+<p><strong>At the lowest values a real neighbor is deleted:</strong> at 0.1 one more bunch turns red than at 0.3,
+because two touching bunches overlap enough for NMS to treat the second as a duplicate of the first. The effect is
+small here (one bunch), since most bunches overlap their neighbors only a little; between about 0.3 and 0.5 this image
+is clean, with no orange box and only the same three missed bunches.</p>
+<p><strong>The best value depends on crowding:</strong> where objects never overlap, a low value is safe; in dense
+scenes (bunches in a clump, herds, shelves, crowds) real objects overlap, and a higher threshold is needed to keep
+them, at the price of some duplicates. For these vines a value around 0.5–0.7 is a good compromise.</p>
 """)

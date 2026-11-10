@@ -67,7 +67,7 @@ curves_50 = pr_curves(all_predictions)
 # %% [markdown]
 # ### 🟡 The Confidence Threshold: Precision or Recall?
 #
-# The drone sprays every spot with a weed box. An invented box wastes herbicide; a missed weed keeps growing.
+# The vineyard counts bunches to estimate the harvest. An invented box inflates the estimate; a missed bunch deflates it.
 #
 # **Before running the code:**
 # - Raising the confidence threshold from 0.1 to 0.8: what happens to precision and recall? Write down your guess.
@@ -78,7 +78,7 @@ curves_50 = pr_curves(all_predictions)
 #
 # **Observe and interpret:**
 # - What happens to the orange (invented) and the red (missed) boxes as the threshold rises?
-# - Which threshold would you choose for spraying, and why is none best for both precision and recall?
+# - Which threshold would you choose for the harvest estimate, and why is none best for both precision and recall?
 
 # %%
 # @title 🔎 Explore the Confidence Threshold { display-mode: "form" }
@@ -112,14 +112,14 @@ callout("answer", "💡 Sample Answer", r"""
 <p><strong>Raising the threshold increases precision and lowers recall.</strong> Low-confidence boxes are mostly
 false positives, so removing them makes the shown boxes more trustworthy (fewer orange boxes), but some real
 objects also had low confidence and are now missed (more red boxes). The dot slides left and up along the curve.
-Over the validation images, precision rises from roughly 0.5 at a threshold of 0.1 to 0.8–0.9 at 0.5 and above,
-while recall falls from roughly 0.9 to 0.5 at 0.5 and almost nothing at 0.8. This model is rarely very confident,
-because the objects are tiny, so recall collapses early.</p>
-<p><strong>For spraying</strong>, a missed weed is usually worse than a wasted spot, so a low threshold of about
-0.2–0.3 is defensible, which keeps recall around 0.85 at a precision of about 0.6–0.65. How low depends on what an
-empty spray patch costs against a weed left growing: that is a decision about the farm, not about the model. No
-threshold is best for both, because the same low-confidence boxes contain both the invented weeds and some of the
-real ones.</p>
+Over the validation images, precision rises from roughly 0.5 at a threshold of 0.1 to 0.9 at 0.5 and nearly 1.0
+at 0.8, while recall falls from roughly 0.9 to 0.65 at 0.5 and about 0.2 at 0.8. The model is rarely very
+confident about a bunch partly hidden by leaves, so recall drops steadily and ends low.</p>
+<p><strong>For a harvest estimate</strong>, invented and missed boxes both bias the count, so a middle threshold
+of about 0.3–0.5 is defensible: it keeps precision around 0.75–0.9 and recall around 0.65–0.8, so the errors
+roughly cancel in the total. If the bunches are also to be picked or measured one by one, a wrong box costs more
+and a higher threshold fits. That is a decision about the vineyard, not about the model. No threshold is best for
+both, because the same low-confidence boxes contain both the invented bunches and some of the real ones.</p>
 """)
 
 # %% [markdown]
@@ -181,13 +181,12 @@ print(f"mAP@50–95, our computation: {np.mean(map_per_iou):.3f} · Ultralytics 
 # %%
 # @title 💡 Sample Answer { display-mode: "form" }
 callout("answer", "💡 Sample Answer", r"""
-<p><strong>AP falls as the required IoU rises, and here it falls fast.</strong> mAP@50 is roughly 0.75, but
-the bars drop to about half at IoU 0.75 and to almost nothing at 0.9, so mAP@50–95 is only about 0.45. The gap of
-about 0.3 means the model <em>finds</em> the weeds, but its boxes are not tight. This is expected for tiny
-objects: for a weed 20 pixels wide, a box shifted by just 3 pixels in both directions already has an IoU of only about 0.55.</p>
-<p><strong>mAP@50</strong> is the right number when finding is what matters: is there a weed at this spot, so that the
-sprayer aims there. <strong>mAP@50–95</strong> matters when the box itself is used: measuring how much of the field
-is covered by weeds, or choosing the dose from the size of each weed.</p>
-<p><strong>The crop AP is very noisy:</strong> only about 25 of the validation boxes are crop plants, so one
-more or fewer found box moves it a lot.</p>
+<p><strong>AP falls as the required IoU rises, and here it falls fast.</strong> mAP@50 is roughly 0.85–0.9, but
+the bars drop to about 0.6 at IoU 0.75 and to about 0.1 at 0.9, so mAP@50–95 is only about 0.5–0.55. The gap of
+about 0.3 means the model <em>finds</em> the bunches, but its boxes are not always tight. This is partly because
+bunch edges are fuzzy: for a bunch 45 pixels wide, a box shifted by just 5 pixels in both directions already has an
+IoU of only about 0.65.</p>
+<p><strong>mAP@50</strong> is the right number when finding is what matters: is there a bunch at this spot, so
+that it is counted for the harvest estimate. <strong>mAP@50–95</strong> matters when the box itself is used:
+estimating each bunch's size or weight from its box, or guiding a harvesting robot's gripper.</p>
 """)

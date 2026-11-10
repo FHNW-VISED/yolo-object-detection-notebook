@@ -3,23 +3,24 @@
 #
 # Download the dataset, recall YOLO's label format, and look at some images and boxes.
 #
-# A drone flies low over a field and takes photos. A farmer who knows where the weeds are can spray only those spots, saving herbicide. A detector must find every weed and tell it from the crop.
+# A vineyard estimates its harvest by counting grape bunches in photos of each vine row. Bunches hang side by side and hide each other, so a detector must separate neighbors.
 #
-# Our dataset has photos taken from above, with boxes around crop plants and weeds: two classes, almost all weeds. The objects are tiny, around 20 pixels wide in a 640 × 640 image, and look nothing like COCO's photos. We only look briefly here.
+# Our dataset has vine photos with one box per grape bunch: a single class. A bunch is typically 5 to 10 % of the image width, and neighboring boxes often touch. Dataset exploration is in *Know Your Images*; we only look briefly here.
 
 # %% [markdown]
-# The next cell downloads the images (about 55 MB, one to two minutes the first time; later runs reuse them). To keep training short, we use a fixed random subset: 500 training and 150 validation images.
+# The next cell downloads the images (about 300 MB, one to two minutes the first time; later runs reuse them) and shrinks each to 640 pixels on its longer side. We use the dataset's own split: 242 training and 58 validation images.
 
 # %%
 # @title Download the Dataset { display-mode: "form" }
-import shutil
+import urllib.request
+from concurrent.futures import ThreadPoolExecutor
 
 import yaml
-from huggingface_hub import list_repo_files, snapshot_download
 from ultralytics.data.utils import check_det_dataset
 
-REPO_ID = "LibreYOLO/weed-crop-aerial"  # Roboflow 100 "weed-crop-aerial" in YOLO format, CC BY 4.0, no login needed
+WGISD_RAW = "https://raw.githubusercontent.com/thsant/wgisd/master"  # Embrapa WGISD (grape bunches), no login needed
 IMAGE_SUFFIXES = {".jpg", ".jpeg", ".png", ".bmp"}
+MAX_SIDE = 640  # longer side of every image after resizing; labels are normalized, so they stay valid
 
 
 def images_in(folder) -> list[Path]:
@@ -33,30 +34,60 @@ def label_path_for(image: Path) -> Path:
     return Path(*parts[:i], "labels", *parts[i + 1:]).with_suffix(".txt")
 
 
-def download_subset(n_train: int, n_val: int) -> Path:
-    """Download a fixed random sample of images and labels, and return the path of its data.yaml.
+def fetch(url: str, target: Path) -> None:
+    """Download one file unless it is already there; write to a .part file first so a broken download never counts."""
+    if target.exists():
+        return
+    target.parent.mkdir(parents=True, exist_ok=True)
+    part = target.with_name(target.name + ".part")
+    with urllib.request.urlopen(url, timeout=60) as response:
+        part.write_bytes(response.read())
+    part.replace(target)
 
-    Safe to run again: a finished download is reused, an unfinished one is restarted (N-019).
+
+def fetch_pair(name: str, folder: Path) -> None:
+    """Download one photo and its label file, then shrink the photo so its longer side is MAX_SIDE pixels."""
+    image, label = folder / "images" / f"{name}.jpg", folder / "labels" / f"{name}.txt"
+    fetch(f"{WGISD_RAW}/data/{name}.txt", label)
+    marker = image.with_name(image.name + ".done")  # the photo is resized in place, so a marker says it is finished
+    if marker.exists():
+        return
+    image.unlink(missing_ok=True)
+    fetch(f"{WGISD_RAW}/data/{name}.jpg", image)
+    with Image.open(image) as im:
+        scale = MAX_SIDE / max(im.size)
+        small = im.convert("RGB").resize((round(im.width * scale), round(im.height * scale)), Image.LANCZOS) if scale < 1 else None
+    if small is not None:
+        small.save(image, quality=92)
+    marker.touch()
+
+
+def split_names(split: str) -> list[str]:
+    """The image names listed in the dataset's train.txt or test.txt, without extension."""
+    with urllib.request.urlopen(f"{WGISD_RAW}/{split}.txt", timeout=60) as response:
+        return [Path(line.strip()).stem for line in response.read().decode().splitlines() if line.strip()]
+
+
+def download_subset(n_train: int, n_val: int) -> Path:
+    """Download the first n_train training and n_val validation images with their labels, and return the path of data.yaml.
+
+    Safe to run again: finished files are skipped and half-finished ones are fetched again (N-019).
     """
-    root = Path(f"data/datasets/weed-crop-aerial-{n_train}-{n_val}").resolve()
+    root = Path(f"data/datasets/wgisd-grapes-{n_train}-{n_val}").resolve()
     yaml_path = root / "data.yaml"
     if yaml_path.exists():  # written last, so its presence means the download finished
         return yaml_path
-    shutil.rmtree(root, ignore_errors=True)
-    files = list_repo_files(REPO_ID, repo_type="dataset")
-    chosen = []
-    for folder, n in (("train", n_train), ("valid", n_val)):
-        names = sorted(f for f in files if f.startswith(f"{folder}/images/"))
-        for image in random.Random(SEED).sample(names, n):
-            chosen += [image, str(Path(image.replace("/images/", "/labels/")).with_suffix(".txt"))]
-    snapshot_download(REPO_ID, repo_type="dataset", local_dir=root, allow_patterns=chosen, token=False)
+    jobs = [(name, root / folder) for folder, split, n in (("train", "train", n_train), ("valid", "test", n_val))
+            for name in split_names(split)[:n]]
+    with ThreadPoolExecutor(max_workers=16) as pool:
+        list(pool.map(lambda job: fetch_pair(*job), jobs))
     yaml_path.write_text(yaml.safe_dump({"path": str(root), "train": "train/images", "val": "valid/images",
-                                         "names": dict(enumerate(["crop", "weed"]))}))
+                                         "names": {0: "grape"}}))
     return yaml_path
 
 
 # In smoke mode (automated tests only) the same code downloads a handful of images instead.
-data_info = check_det_dataset(str(download_subset(8, 4) if SMOKE else download_subset(500, 150)))
+data_info = check_det_dataset(str(download_subset(8, 4) if SMOKE else download_subset(242, 58)))
 CLASS_NAMES = [data_info["names"][k] for k in sorted(data_info["names"])]
 DATA_YAML = Path(data_info["yaml_file"])
 TRAIN_IMAGES = images_in(data_info["train"])
@@ -75,12 +106,11 @@ print(f"{len(TRAIN_IMAGES)} training images · {len(VAL_IMAGES)} validation imag
 # A file `data.yaml` tells Ultralytics where the images are and what the classes are called:
 #
 # ```
-# path: /content/data/datasets/weed-crop-aerial-500-150
+# path: /content/data/datasets/wgisd-grapes-242-58
 # train: train/images
 # val: valid/images
 # names:
-#   0: crop
-#   1: weed
+#   0: grape
 # ```
 #
 # The next cell prints the first lines of one label file and its image size.
@@ -196,10 +226,10 @@ show(fig)
 # %%
 # @title 💡 Sample Answer { display-mode: "form" }
 callout("answer", "💡 Sample Answer", r"""
-<p><strong>It predicts almost nothing.</strong> On the four images the COCO model finds no box at all. Over all
-150 validation images it finds a box in only about one image in ten, with the wrong kind of label: a "bird", a
-"frisbee" or a "potted plant" on a patch of soil or a leaf. None of COCO's 80 classes is a weed or a crop plant, and
-the objects are far smaller than the people and cars it knows.</p>
+<p><strong>It cannot name our objects.</strong> None of COCO's 80 classes is a grape bunch, so the model either
+finds nothing or labels a bunch with the closest fruit it knows. In our run it found nothing on two of the four
+images and called a few bunches "banana" or "orange" on the other two. Check the titles above for the labels
+you got; they depend on the images.</p>
 <p><strong>Why fine-tune:</strong> a detector can only output the classes it was trained on. Its features (edges,
 textures, shapes) are still useful, so we keep them and teach the last layers our classes.</p>
 """)

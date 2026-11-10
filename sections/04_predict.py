@@ -129,7 +129,7 @@ print(f"{len(VAL_IMAGES)} validation images: {n_boxes} predicted boxes, {n_gt} g
 # Each image shows the ground truth as dashed outlines and the predictions as solid boxes with class and confidence, colored by the rule above.
 #
 # **Before running the code:**
-# - Which mistake do you expect more often: invented weeds (FP) or missed weeds (FN)?
+# - Which mistake do you expect more often: invented bunches (FP) or missed bunches (FN)?
 #
 # **Explore:**
 # - Browse at least ten validation images (Previous / Next).
@@ -174,13 +174,14 @@ browse_show()
 # %%
 # @title 💡 Sample Answer { display-mode: "form" }
 callout("answer", "💡 Sample Answer", r"""
-<p><strong>True positives</strong> are weeds that stand out from bare soil: a small green plant with nothing else
-around it. At confidence 0.25 the model finds roughly four out of five of the labeled objects.</p>
-<p><strong>False positives are more frequent than false negatives</strong>, about three times as many. Almost all
-of them are small spots with no label nearby, not duplicates: tiny seedlings, leaf fragments, straw or dark patches
-of soil. Many look like the objects that <em>are</em> labeled, so the labeling is possibly incomplete there and the
-model right; only a look at the image can tell.</p>
-<p><strong>False negatives</strong> are mostly the smallest objects (about 17 pixels across, against about 21 for
-all objects), weeds that look unlike the typical small seedling (for example one much larger than the others), and
-weeds in a planter between similar-looking crop seedlings.</p>
+<p><strong>True positives</strong> are bunches that hang clearly in view: pale green, fairly large, with leaves
+only at their edge. At confidence 0.25 the model finds roughly five out of six of the labeled bunches (recall
+about 0.8–0.85).</p>
+<p><strong>False positives are more frequent than false negatives</strong>, about twice as many. Almost all of
+them sit on or right next to a labeled bunch, not on bare background: a second box on the same bunch, a box that
+covers only half of it, or one box around two touching bunches. Some may be real bunches the annotators left
+unlabeled, deep in the background; only a look at the image can tell.</p>
+<p><strong>False negatives</strong> are mostly bunches half hidden behind leaves, small bunches (about 40 pixels
+across, against about 47 for all of them) and bunches cut by the image border. They are not mostly bunches that
+touch a neighbor.</p>
 """)

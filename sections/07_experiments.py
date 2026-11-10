@@ -52,13 +52,13 @@ else:
 # %%
 # @title 💡 Sample Answer { display-mode: "form" }
 callout("answer", "💡 Sample Answer", r"""
-<p><strong>On this small dataset, YOLO11s is not clearly better.</strong> In our test run both models reached about
-the same mAP@50 (roughly 0.75–0.8) and mAP@50–95 (roughly 0.45–0.5), and YOLO11s was sometimes a little lower,
-while it took two to three times as long to train and was slower per image.</p>
-<p><strong>Why:</strong> with a few hundred images, the data, not the model size, limits the result; the larger
-model has more to learn from too little. <strong>Choose YOLO11n</strong> for a drone or a small chip, or when
-many images per second are needed. A larger model pays off with more data, or when every missed object counts.
-Always compare on the validation images, never on the training images.</p>
+<p><strong>On this dataset, YOLO11s is a little better, but not by much.</strong> In our run it reached a
+mAP@50 of roughly 0.88–0.91 against 0.84–0.87 for YOLO11n, and a mAP@50–95 of roughly 0.57–0.61 against
+0.52–0.55. It took about one and a half times as long to train and about twice as long per image on a CPU.</p>
+<p><strong>Why:</strong> the gain is larger for mAP@50–95 than for mAP@50: the extra capacity mostly makes boxes
+tighter, since YOLO11n already finds most bunches. <strong>Choose YOLO11n</strong> for a camera on a tractor or a
+small chip, or when many images per second are needed. <strong>Choose YOLO11s</strong> when box quality matters
+and the time per image does not. Always compare on the validation images, never on the training images.</p>
 """)
 
 # %% [markdown]
@@ -91,14 +91,14 @@ else:
 # %%
 # @title 💡 Sample Answer { display-mode: "form" }
 callout("answer", "💡 Sample Answer", r"""
-<p><strong>The mAP is lower</strong> (in our run mAP@50 dropped from about 0.78 to about 0.72), because the
-features stay those learned for COCO's everyday photos, and aerial images of plants look nothing like them.
-<strong>Training is not faster here</strong>, unlike what you might expect: for such a small model the frozen
-layers still compute their outputs, only their gradients are skipped, and the saving is lost in the rest of the
-work (in our test runs the frozen model even took longer).</p>
+<p><strong>The mAP is lower, but only a little</strong> (in our run mAP@50 dropped from about 0.86 to about
+0.81, and mAP@50–95 from about 0.54 to about 0.49), because the backbone keeps the features learned for COCO's
+everyday photos instead of adapting them to vine leaves and pale bunches. That a frozen backbone still gets so
+close shows that those general features (edges, textures, blobs) transfer well.
+<strong>Training is faster</strong>: about 3 minutes against about 4 in our run, because the frozen layers need no
+gradients. The saving is modest and depends on your hardware.</p>
 <p>Freezing is a good choice with very few training images (it reduces overfitting), with little GPU memory, or
-when the new images look like the pretraining images. The further our images are from COCO, the more it helps to
-fine-tune the backbone as well.</p>
+when time is short. With enough images, fine-tuning the backbone as well gives the better mAP.</p>
 """)
 
 # %%
