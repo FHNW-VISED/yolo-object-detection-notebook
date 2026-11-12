@@ -238,7 +238,7 @@ class ReaderTests(unittest.TestCase):
             import jupytext
         except ImportError:
             self.skipTest("jupytext not installed")
-        path = SECTIONS_DIR / "00_setup.py"
+        path = sorted(SECTIONS_DIR.glob("*.py"))[0]  # the first section; names differ per repo
         mine = port_her.read_section_cells(path)
         theirs = jupytext.read(path, fmt="py:percent").cells
         self.assertEqual(len(mine), len(theirs))

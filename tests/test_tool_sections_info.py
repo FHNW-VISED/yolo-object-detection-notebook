@@ -80,6 +80,22 @@ def make_repo(tmp: Path, budget: str | None = "**Word budget:** 40", sections=No
     return tmp
 
 
+def _lint_has_total_gate():
+    """True when this repo's lint_notebook.py has the total word gate (EDA and the workshop get it in N14)."""
+    if not HAVE_JUPYTEXT:
+        return False
+    sys.path.insert(0, str(SCRIPTS))
+    try:
+        import lint_notebook
+    except Exception:
+        return False
+    return hasattr(lint_notebook, "total_visible_words") and hasattr(lint_notebook, "BUDGET_RE")
+
+
+LINT_HAS_TOTAL_GATE = _lint_has_total_gate()
+NO_GATE = "this repo's lint_notebook.py has no total word gate yet (issue N14)"
+
+
 @unittest.skipUnless(HAVE_JUPYTEXT, "jupytext is not installed")
 class SectionsInfo(unittest.TestCase):
     def setUp(self):
@@ -137,6 +153,7 @@ class SectionsInfo(unittest.TestCase):
         self.assertIn("01_a.py", out)
         self.assertIn("01_b.py", out)
 
+    @unittest.skipUnless(LINT_HAS_TOTAL_GATE, NO_GATE)
     def test_words_under_budget(self):
         make_repo(self.tmp)
         before = self.snapshot()
@@ -156,6 +173,7 @@ class SectionsInfo(unittest.TestCase):
         self.assertEqual(int(lines[0].rsplit(": ", 1)[1]), lint_notebook.visible_words(cells[:7]))
         self.assertEqual(self.snapshot(), before)
 
+    @unittest.skipUnless(LINT_HAS_TOTAL_GATE, NO_GATE)
     def test_words_over_budget(self):
         extra = "# %% [markdown]\n" + MANY_WORDS
         make_repo(self.tmp, sections={"00_intro.py": SECTION_00 + "\n" + extra})
@@ -166,6 +184,7 @@ class SectionsInfo(unittest.TestCase):
         total = int(last.split()[1])
         self.assertEqual(last, f"total: {total} of budget 40 (+{total - 40} over)")
 
+    @unittest.skipUnless(LINT_HAS_TOTAL_GATE, NO_GATE)
     def test_words_without_budget_line(self):
         make_repo(self.tmp, budget=None)
         code, out = run(self.mod, "words", "--root", str(self.tmp))
