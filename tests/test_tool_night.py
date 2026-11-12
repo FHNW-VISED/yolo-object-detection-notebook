@@ -115,6 +115,11 @@ class NightBase(unittest.TestCase):
             NB_VAULT=str(self.root / "vault"),
             NIGHT_DATE=DATE,
             RECORD=str(self.record),
+            # night.sh commits; CI runners have no git identity (seen on ubuntu CI, 2026-11-12)
+            GIT_AUTHOR_NAME="t",
+            GIT_AUTHOR_EMAIL="t@t",
+            GIT_COMMITTER_NAME="t",
+            GIT_COMMITTER_EMAIL="t@t",
         )
         base.update(env or {})
         return subprocess.run(
