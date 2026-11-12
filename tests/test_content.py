@@ -97,7 +97,7 @@ def test_training_runs_and_curves_are_plotted(nb):
     assert "Training took" in outputs_text(nb, "03_")
     assert images_in(nb, "03_") >= 1
     src = source_of(nb, "03_")
-    assert "EPOCHS" in src and "BATCH_SIZE" in src and "Sample Answer" in src  # her batch/epochs task kept
+    assert "epochs" in src and "batch_size" in src and "Sample Answer" in src  # her batch/epochs task kept
 
 
 def test_tp_fp_fn_task_is_kept(nb):

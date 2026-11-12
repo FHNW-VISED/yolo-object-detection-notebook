@@ -24,7 +24,7 @@ prediction matched: a missed object.</li>
 """)
 
 # %%
-# @title Helpers: Matching and Drawing { display-mode: "form" }
+# @title Helpers: matching and drawing { display-mode: "form" }
 MATCH_IOU = 0.5  # IoU a prediction needs to count as a true positive
 
 
@@ -113,12 +113,11 @@ def match_legend(fig):
 # %% [markdown]
 # ### Predict on the Validation Images
 #
-# The next cell runs the fine-tuned model on every validation image and keeps every box with confidence of at least `SHOW_CONF` = 0.25, the Ultralytics default. Later sections lower it.
+# The next cell runs the fine-tuned model on every validation image and keeps every box with confidence of at least 0.25, the Ultralytics default. Later sections lower it.
 
 # %%
-# @title Predict on the Validation Images { display-mode: "form" }
-SHOW_CONF = 0.25
-val_predictions = predict_all(best_weights, VAL_IMAGES, conf=SHOW_CONF)
+# @title Predict on the validation images { display-mode: "form" }
+val_predictions = predict_all(best_weights, VAL_IMAGES, conf=0.25)
 n_boxes = sum(len(p["conf"]) for p in val_predictions.values())
 n_gt = sum(len(read_gt(p)["cls"]) for p in VAL_IMAGES)
 print(f"{len(VAL_IMAGES)} validation images: {n_boxes} predicted boxes, {n_gt} ground-truth boxes.")
@@ -139,7 +138,7 @@ print(f"{len(VAL_IMAGES)} validation images: {n_boxes} predicted boxes, {n_gt} g
 # - Why might the model have made each FP and FN? Consider object size, occlusion, the image edge, and whether the ground truth is right.
 
 # %%
-# @title 🔎 Browse Predictions vs. Ground Truth { display-mode: "form" }
+# @title 🔎 Browse predictions vs. ground truth { display-mode: "form" }
 browse_index = 0
 browse_output = widgets.Output()
 browse_prev = widgets.Button(description="← Previous")

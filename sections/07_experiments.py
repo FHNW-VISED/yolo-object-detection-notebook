@@ -25,7 +25,7 @@ RUN_EXPERIMENTS = False  # @param {type:"boolean"}
 # - For which use would you choose each model?
 
 # %%
-# @title 🔎 Train YOLO11s and Compare { display-mode: "form" }
+# @title 🔎 Train YOLO11s and compare { display-mode: "form" }
 def evaluate(weights) -> dict:
     """mAP and speed of one trained model on the validation images."""
     detector = YOLO(str(weights))
@@ -75,7 +75,7 @@ and the time per image does not. Always compare on the validation images, never 
 # - When would freezing be a good choice?
 
 # %%
-# @title 🔎 Train YOLO11n with a Frozen Backbone { display-mode: "form" }
+# @title 🔎 Train YOLO11n with a frozen backbone { display-mode: "form" }
 if RUN_EXPERIMENTS or SMOKE:
     model_frozen = YOLO("yolo11n.pt")
     describe(model_frozen, "YOLO11n, first 10 layers frozen")

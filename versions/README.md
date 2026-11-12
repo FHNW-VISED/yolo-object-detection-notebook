@@ -16,3 +16,4 @@ Never edit a version folder.
 | v07 | 2026-11-10 | v07: quiet Ultralytics output; one line per epoch; model card before each training | ab7ee48 |
 | v08 | 2026-11-10 | v08: per-epoch line printed once | 31532a3 |
 | v09 | 2026-11-10 | v09: Mac-only PyTorch warning silenced in the training cell | 83476e7 |
+| v10 | 2026-11-12 | v10 Susanne's returned copy: sentence-case cell titles, fewer constants, NMS zoom, show-boxes toggle, visible train call | 6f6c5b6 |

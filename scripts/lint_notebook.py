@@ -227,7 +227,9 @@ def main() -> int:
                     smoke_defined = True
                 if src.lstrip().startswith("!pip"):
                     fail(where, "use %pip, not !pip (N-021)")
-                if not CODE_START_RE.match(src.lstrip()):
+                # A cell tagged "show-code" (`# %% tags=["show-code"]`) is left visible on purpose:
+                # the collaborator wants learners to read that call (SN-021).
+                if not CODE_START_RE.match(src.lstrip()) and "show-code" not in cell.metadata.get("tags", []):
                     fail(where, "run-only cell must be collapsed with '# @title <what it does>' (N-035)")
                 if BOXPLOT_RE.search(src) and not WITH_SUSANNE:
                     fail(where, "box plot: draw distributions as violin plots (N-040)")

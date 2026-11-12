@@ -140,15 +140,16 @@ def read_gt(image) -> dict:
 CLASS_COLORS = ["#E07A5F", "#3D405B", "#81B29A", "#9C89B8", "#F2CC8F", "#2A9D8F"]  # one per class, in order
 
 
-def show_gt(ax, image, title=""):
+def show_gt(ax, image, title="", show_boxes=True):
     gt = read_gt(image)
     ax.imshow(Image.open(image).convert("RGB"))
     ax.axis("off")
-    for box, k in zip(gt["xyxy"], gt["cls"], strict=True):
-        x0, y0, x1, y1 = box
-        ax.add_patch(mpl.patches.Rectangle((x0, y0), x1 - x0, y1 - y0, fill=False, lw=1.8,
-                                           edgecolor=CLASS_COLORS[k % len(CLASS_COLORS)]))
-    ax.set_title(f"{title}{len(gt['cls'])} boxes", fontsize=9)
+    if show_boxes:
+        for box, k in zip(gt["xyxy"], gt["cls"], strict=True):
+            x0, y0, x1, y1 = box
+            ax.add_patch(mpl.patches.Rectangle((x0, y0), x1 - x0, y1 - y0, fill=False, lw=1.8,
+                                               edgecolor=CLASS_COLORS[k % len(CLASS_COLORS)]))
+    ax.set_title(f"{title}{len(gt['cls'])} boxes" if show_boxes else title, fontsize=9)
 
 
 # %% [markdown]
@@ -162,6 +163,7 @@ gt_page = 0
 gt_output = widgets.Output()
 gt_prev, gt_next = widgets.Button(description="← Previous"), widgets.Button(description="Next →")
 gt_counter = widgets.HTML()
+gt_show_boxes = widgets.Checkbox(value=True, description="Show boxes", indent=False)
 GT_PAGE_SIZE = 4
 
 
@@ -173,11 +175,12 @@ def gt_show():
         for ax in axes.ravel():
             ax.axis("off")
         for ax, image in zip(axes.ravel(), page, strict=False):
-            show_gt(ax, image)
-        handles = [mpl.patches.Patch(edgecolor=CLASS_COLORS[k % len(CLASS_COLORS)], fill=False, lw=2, label=name)
-                   for k, name in enumerate(CLASS_NAMES)]
-        fig.legend(handles=handles, loc="lower center", ncol=len(CLASS_NAMES), frameon=False,
-                   bbox_to_anchor=(0.5, -0.06))
+            show_gt(ax, image, show_boxes=gt_show_boxes.value)
+        if gt_show_boxes.value:
+            handles = [mpl.patches.Patch(edgecolor=CLASS_COLORS[k % len(CLASS_COLORS)], fill=False, lw=2, label=name)
+                       for k, name in enumerate(CLASS_NAMES)]
+            fig.legend(handles=handles, loc="lower center", ncol=len(CLASS_NAMES), frameon=False,
+                       bbox_to_anchor=(0.5, -0.06))
         show_live(fig)
     n_pages = -(-len(TRAIN_IMAGES) // GT_PAGE_SIZE)
     gt_counter.value = f"Page {gt_page + 1} of {n_pages}"
@@ -192,7 +195,9 @@ def gt_step(step):
 
 gt_prev.on_click(lambda _: gt_step(-1))
 gt_next.on_click(lambda _: gt_step(1))
-display(widgets.HBox([gt_prev, gt_next, gt_counter]), gt_output)
+gt_show_boxes.observe(lambda _: gt_show(), names="value")
+
+display(widgets.HBox([gt_prev, gt_next, gt_counter, gt_show_boxes]), gt_output)
 gt_show()
 
 # %% [markdown]

@@ -28,21 +28,21 @@ into one), so the model rarely sees the same picture twice.</li>
 # - Will you need more or fewer epochs than for COCO? Why?
 #
 # **Explore:**
-# 1. Set `EPOCHS` (5 to 50) and `BATCH_SIZE` (8, 16 or 32; a T4 handles 16) in the cell below. Each extra 10 epochs costs about two minutes on a T4.
+# 1. Set `epochs` (5 to 50) and `batch_size` (8, 16 or 32; a T4 handles 16) in the cell below. Each extra 10 epochs costs about two minutes on a T4.
 # 2. Run the training cell after it.
 #
 # **Observe and interpret:**
 # - Did the model stop improving before the last epoch, or would more epochs help?
 
 # %%
-# ✏️ YOUR TURN: training settings
-EPOCHS = 20  # @param {type:"slider", min:5, max:50, step:5}
-BATCH_SIZE = 16  # @param [8, 16, 32] {type:"raw"}
+# ✏️ YOUR TURN: Training settings
+epochs = 20  # @param {type:"slider", min:5, max:50, step:5}
+batch_size = 16  # @param [8, 16, 32] {type:"raw"}
 IMG_SIZE = 640  # pixels, the size YOLO11 was pretrained at
 
-if BATCH_SIZE not in (8, 16, 32) or not 1 <= EPOCHS <= 100:
-    raise ValueError("Choose BATCH_SIZE from 8, 16, 32 and EPOCHS between 1 and 100.")
-print(f"Training for {EPOCHS} epochs with batches of {BATCH_SIZE} images at {IMG_SIZE} px.")
+if batch_size not in (8, 16, 32) or not 1 <= epochs <= 100:
+    raise ValueError("Choose batch_size from 8, 16, 32 and epochs between 1 and 100.")
+print(f"Training for {epochs} epochs with batches of {batch_size} images at {IMG_SIZE} px.")
 
 # %%
 # @title 💡 Sample Answer { display-mode: "form" }
@@ -61,22 +61,7 @@ work but each epoch takes longer; 32 may run out of memory for the larger YOLO11
 # The next cell fine-tunes YOLO11n and prints one line per epoch: training losses, then precision, recall and mAP on the validation images. **The first epoch is the slowest**, because the images are cached. On a T4 the default run takes about 4 to 6 minutes.
 
 # %%
-# @title Train YOLO11n { display-mode: "form" }
-# In smoke mode (automated tests only) the same call runs with tiny settings on the CPU.
-train_settings = dict(
-    data=str(DATA_YAML),
-    epochs=1 if SMOKE else EPOCHS,
-    batch=4 if SMOKE else BATCH_SIZE,
-    imgsz=160 if SMOKE else IMG_SIZE,
-    device="cpu" if SMOKE else DEVICE,
-    workers=0 if SMOKE else 2,
-    seed=SEED,
-    deterministic=True,
-    project=str(RUNS_DIR.resolve()),
-    exist_ok=True,  # re-running overwrites this run instead of creating train2, train3, ...
-    plots=not SMOKE,
-)
-
+# @title Helper: Model description and training summary { display-mode: "form" }
 from ultralytics.utils.torch_utils import get_flops
 
 
@@ -108,6 +93,21 @@ def train_with_summary(model, name: str, **settings) -> float:
     model.train(name=name, **settings)
     return (time.time() - start) / 60
 
+# %% tags=["show-code"]
+# In smoke mode (automated tests only) the same call runs with tiny settings on the CPU.
+train_settings = dict(
+    data=str(DATA_YAML),
+    epochs=1 if SMOKE else epochs,
+    batch=4 if SMOKE else batch_size,
+    imgsz=160 if SMOKE else IMG_SIZE,
+    device="cpu" if SMOKE else DEVICE,
+    workers=0 if SMOKE else 2,
+    seed=SEED,
+    deterministic=True,
+    project=str(RUNS_DIR.resolve()),
+    exist_ok=True,  # re-running overwrites this run instead of creating train2, train3, ...
+    plots=not SMOKE,
+)
 
 import warnings
 

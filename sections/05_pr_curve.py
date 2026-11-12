@@ -12,14 +12,14 @@
 # The next cell predicts again, keeping every box down to confidence 0.001, as Ultralytics does for metrics. Each threshold below then just filters these boxes.
 
 # %%
-# @title Predict with a Very Low Threshold { display-mode: "form" }
+# @title Predict with a very low threshold { display-mode: "form" }
 METRIC_CONF = 0.001  # Ultralytics' threshold for metrics: keep (almost) everything, then sweep
 all_predictions = predict_all(best_weights, VAL_IMAGES, conf=METRIC_CONF)
 gt_all = {p: read_gt(p) for p in VAL_IMAGES}
 print(f"{sum(len(p['conf']) for p in all_predictions.values())} candidate boxes on {len(VAL_IMAGES)} images.")
 
 # %%
-# @title Helpers: Precision–Recall Curves and AP { display-mode: "form" }
+# @title Helpers: precision-recall curves and AP { display-mode: "form" }
 trapezoid = getattr(np, "trapezoid", None) or np.trapz  # NumPy 2 renamed trapz
 
 
@@ -81,7 +81,7 @@ curves_50 = pr_curves(all_predictions)
 # - Which threshold would you choose for the harvest estimate, and why is none best for both precision and recall?
 
 # %%
-# @title 🔎 Explore the Confidence Threshold { display-mode: "form" }
+# @title 🔎 Explore the confidence threshold { display-mode: "form" }
 def show_threshold(conf: float, image: int):
     path = VAL_IMAGES[image]
     fig, (ax_img, ax_pr) = plt.subplots(1, 2, figsize=(13, 5), gridspec_kw={"width_ratios": [1.25, 1]})
@@ -128,7 +128,7 @@ both, because the same low-confidence boxes contain both the invented bunches an
 # Choosing a threshold is a deployment decision. To compare *models*, we want one number that ignores it: the **average precision (AP)**, the area under the precision–recall curve. A perfect detector has AP = 1. **mAP** is the mean AP over all classes. Ultralytics computes it too, as the next cell shows.
 
 # %%
-# @title 🔎 Compute AP per Class and Compare with Ultralytics { display-mode: "form" }
+# @title 🔎 Compute AP per class and compare with Ultralytics { display-mode: "form" }
 val_metrics = YOLO(str(best_weights)).val(data=str(DATA_YAML), imgsz=160 if SMOKE else IMG_SIZE, batch=4 if SMOKE else 16,
                                           device="cpu" if SMOKE else DEVICE, plots=False, verbose=False)
 ap_50 = {k: average_precision(c) for k, c in curves_50.items()}
@@ -165,7 +165,7 @@ print(f"mAP@50, Ultralytics val:  {val_metrics.box.map50:.3f} (small differences
 # - Name one application where mAP@50 is the number to watch, and one where mAP@50–95 matters more.
 
 # %%
-# @title 🔎 AP at Ten IoU Thresholds { display-mode: "form" }
+# @title 🔎 AP at ten IoU thresholds { display-mode: "form" }
 IOU_THRESHOLDS = np.round(np.arange(0.50, 0.96, 0.05), 2)
 map_per_iou = [np.mean([average_precision(c) for c in pr_curves(all_predictions, t).values()]) for t in IOU_THRESHOLDS]
 

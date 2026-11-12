@@ -31,14 +31,14 @@
 # - Why does the best value depend on how crowded the scenes are?
 
 # %%
-# @title 🔎 Explore the NMS Threshold { display-mode: "form" }
-NMS_CONF = 0.25  # the display threshold of section Predictions: TP, FP and FN
+# @title 🔎 Explore the NMS threshold { display-mode: "form" }
+nms_conf = 0.25  # the display threshold of section Predictions: TP, FP and FN
 crowded_image = max(VAL_IMAGES, key=lambda p: len(read_gt(p)["cls"]))
 nms_detector = YOLO(str(best_weights))
 
 
 def predict_with_nms(nms_iou: float) -> dict:
-    r = nms_detector.predict(str(crowded_image), conf=NMS_CONF, iou=nms_iou, imgsz=160 if SMOKE else IMG_SIZE,
+    r = nms_detector.predict(str(crowded_image), conf=nms_conf, iou=nms_iou, imgsz=160 if SMOKE else IMG_SIZE,
                              device="cpu" if SMOKE else DEVICE, verbose=False)[0]
     return {"xyxy": r.boxes.xyxy.cpu().numpy(), "conf": r.boxes.conf.cpu().numpy(),
             "cls": r.boxes.cls.cpu().numpy().astype(int)}
@@ -52,6 +52,15 @@ def show_nms(nms_iou: float):
     draw_matches(ax_default, crowded_image, nms_default, title="default NMS IoU 0.70 · ", show_conf=False)
     draw_matches(ax_yours, crowded_image, predict_with_nms(nms_iou), title=f"your NMS IoU {nms_iou:.2f} · ",
                  show_conf=False)
+
+    # Zoom into the same ROI in both images
+    with Image.open(crowded_image) as im:
+        w, h = im.size
+
+    for ax in (ax_default, ax_yours):
+        ax.set_xlim(0.05 * w, 0.35 * w)
+        ax.set_ylim(0.65 * h, 0.15 * h)
+
     match_legend(fig)
     show_live(fig)
 
